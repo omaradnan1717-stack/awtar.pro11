@@ -4,7 +4,144 @@
 <link rel="apple-touch-icon" href="./EAA22950-3580-4F02-B8F1-5DC375E0C210.png">
 <link rel="icon" type="image/png" href="./EAA22950-3580-4F02-B8F1-5DC375E0C210.png">
 </head><body><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
-const KEY='awtar_staff_pro_v4';let db;try{db=JSON.parse(localStorage.getItem(KEY))||{workers:[],ops:[],trash:[]}}catch(e){db={workers:[],ops:[],trash:[]}};db.workers ||= [];db.ops ||= [];db.trash ||= [];db.config ||= {departments:['المطبخ','الصالة','الكافيه','الإدارة'],fields:[],business:'مطعم وكافيه أوتار'};let tab='workers',selected=null,period=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');const $=id=>document.getElementById(id),fmt=n=>Math.round(Number(n)||0).toLocaleString('en-US')+' د.ع',esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])),save=()=>{try{localStorage.setItem(KEY,JSON.stringify(db))}catch(e){alert('تعذر حفظ البيانات، يرجى تنزيل نسخة احتياطية')}};const eligible=w=>{let first=period+'-01',last=period+'-'+String(new Date(+period.slice(0,4),+period.slice(5),0).getDate()).padStart(2,'0');return (!w.start||w.start<=last)&&(!w.endDate||w.endDate>=first)&&(!(!w.endDate&&w.active===false))};const monthOps=(id)=>db.ops.filter(o=>o.worker===id&&o.date.slice(0,7)===period);function calc(w){let ops=monthOps(w.id),sum=t=>ops.filter(o=>o.type===t).reduce((a,o)=>a+(Number(o.amount)||0),0),year=Number(period.slice(0,4)),month=Number(period.slice(5,7)),days=new Date(year,month,0).getDate(),base=Number(w.salary)||0,first=period+'-01',last=period+'-'+String(days).padStart(2,'0'),from=w.start&&w.start>first?w.start:first,to=w.endDate&&w.endDate<last?w.endDate:last,eligibleDays=from<=to?Math.max(0,(Date.UTC(+to.slice(0,4),+to.slice(5,7)-1,+to.slice(8,10))-Date.UTC(+from.slice(0,4),+from.slice(5,7)-1,+from.slice(8,10)))/86400000+1):0,earned=Math.round(base*eligibleDays/30),advance=sum('advance'),safri=sum('safri'),deductions=sum('deduct'),absenceDays=ops.filter(o=>o.type==='absence').reduce((a,o)=>a+(Number(o.days)||0),0),absence=ops.filter(o=>o.type==='absence').reduce((a,o)=>a+(o.manual?Number(o.amount)||0:base/30*(Number(o.days)||0)),0),deduct=deductions+absence,bonus=sum('bonus'),paid=sum('paid');return{earned,eligibleDays,monthDays:days,absenceDays,advance,safri,deduct,deductions,absence,bonus,paid,remaining:earned+bonus-advance-safri-deduct-paid,ops}}function card(label,value){return `<div class="metric"><small>${label}</small><strong>${fmt(value)}</strong></div>`}function render(){let active=db.workers.filter(w=>w.active!==false),tot=active.map(calc);$('summary').innerHTML=`<div class="stat"><small>العمال النشطون</small><strong>${active.length}</strong></div><div class="stat"><small>الرواتب الأساسية</small><strong>${fmt(active.reduce((a,w)=>a+Number(w.salary),0))}</strong></div><div class="stat"><small>السلف لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.advance,0))}</strong></div><div class="stat"><small>الخصومات لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.deductions,0))}</strong></div><div class="stat"><small>الغياب لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.absence,0))}</strong></div>`;$('tabs').innerHTML=[['workers','العمال'],['salaries','الرواتب'],['log','السجل'],['settings','الإعدادات'],['backup','النسخ الاحتياطي'],['ai','مساعد ChatGPT']].map(([t,n])=>`<button class="${tab===t?'active':''}" onclick="go('${t}')">${n}</button>`).join('');let html='';if(tab==='workers')html=selected?workerView():workersView();if(tab==='salaries')html=salariesView();if(tab==='log')html=logView();if(tab==='ai')html=aiView();if(tab==='settings')html=settingsView();if(tab==='backup')html=backupView();$('main').innerHTML=html}function go(t){tab=t;selected=null;render();scrollTo(0,0)}let workerSearch='';
+const KEY='awtar_staff_pro_v4';
+let db, storage, revision, pendingSave=Promise.resolve();
+function preparePayrollData(data){
+  if(!Array.isArray(data?.workers)||!Array.isArray(data.ops))throw Error('بيانات البرنامج غير صالحة');
+  data.trash ||= [];
+  data.config ||= {departments:['المطبخ','الصالة','الكافيه','الإدارة'],fields:[],business:'مطعم وكافيه أوتار'};
+  return data;
+}
+// Keep backup files and the UI in data-URL format, but store image bytes in IndexedDB.
+function mapPayrollImages(data, convert){
+  const mapWorkers=workers=>Promise.all(workers.map(async worker=>{
+    if(!worker.documents)return worker;
+    const entries=await Promise.all(Object.entries(worker.documents).map(async ([key,image])=>[
+      key, await convert(image)
+    ]));
+    return {...worker,documents:Object.fromEntries(entries)};
+  }));
+  return Promise.all([mapWorkers(data.workers),mapWorkers(data.trash)]).then(([workers,trash])=>({
+    ...data,workers,trash
+  }));
+}
+function packPayrollImage(image){
+  const match=typeof image==='string'&&/^data:(image\/[\w.+-]+);base64,([A-Za-z0-9+/=]+)$/i.exec(image);
+  if(!match)return image;
+  const binary=atob(match[2]);
+  const bytes=Uint8Array.from(binary,character=>character.charCodeAt(0));
+  return new Blob([bytes],{type:match[1]});
+}
+function unpackPayrollImage(image){
+  if(!(image instanceof Blob))return image;
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=()=>reject(reader.error);
+    reader.readAsDataURL(image);
+  });
+}
+function payrollTransaction(update){
+  return new Promise((resolve,reject)=>{
+    const transaction=storage.transaction('state','readwrite');
+    const store=transaction.objectStore('state');
+    const request=store.get(KEY);
+    let result, failure;
+    request.onsuccess=()=>{
+      try{
+        result=update(request.result);
+        if(result!==request.result)store.put(result,KEY);
+      }catch(error){
+        failure=error;
+        transaction.abort();
+      }
+    };
+    transaction.oncomplete=()=>resolve(result);
+    transaction.onabort=()=>reject(failure||transaction.error||Error('تعذّر حفظ البيانات'));
+  });
+}
+async function loadPayroll(){
+  storage=await new Promise((resolve,reject)=>{
+    const request=indexedDB.open('awtar_staff_pro_storage',1);
+    request.onupgradeneeded=()=>request.result.createObjectStore('state');
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error);
+    request.onblocked=()=>reject(Error('أغلق النسخ الأخرى من البرنامج وحاول مرة ثانية'));
+  });
+  const record=await payrollTransaction(current=>{
+    if(current)return current;
+    const legacy=localStorage.getItem(KEY);
+    const data=legacy===null?{workers:[],ops:[]}:JSON.parse(legacy);
+    return {revision:1,data:preparePayrollData(data)};
+  });
+  db=await mapPayrollImages(preparePayrollData(record.data),unpackPayrollImage);
+  revision=record.revision;
+}
+function persistPayroll(data){
+  const snapshot=JSON.parse(JSON.stringify(data));
+  const write=pendingSave.then(async()=>{
+    const packed=await mapPayrollImages(snapshot,packPayrollImage);
+    const saved=await payrollTransaction(current=>{
+      if(current?.revision!==revision)throw Error('تغيّرت البيانات في نافذة ثانية. احتفظ بنسخة احتياطية قبل إعادة فتح البرنامج.');
+      return {revision:revision+1,data:packed};
+    });
+    revision=saved.revision;
+  });
+  pendingSave=write.catch(()=>{});
+  return write;
+}
+function payrollSaveError(error){
+  alert(error.name==='QuotaExceededError'
+    ? 'مساحة تخزين الصور غير كافية. نزّل نسخة احتياطية واحذف الصور غير اللازمة.'
+    : error.message?.startsWith('تغيّرت البيانات')
+      ? error.message
+      : 'تعذّر حفظ التغيير على الجهاز. نزّل نسخة احتياطية قبل إغلاق البرنامج.');
+}
+async function save(){
+  try{await persistPayroll(db);return true}
+  catch(error){payrollSaveError(error);return false}
+}
+async function commitPayrollChange(data){
+  document.body.inert=true;
+  try{
+    await persistPayroll(data);
+    db=data;
+    return true;
+  }catch(error){
+    payrollSaveError(error);
+    return false;
+  }finally{
+    document.body.inert=false;
+  }
+}
+async function changeDocument(id,key,image){
+  const worker=db.workers.find(w=>w.id===id);
+  if(!worker)return false;
+  const documents={...worker.documents};
+  if(image)documents[key]=image;
+  else delete documents[key];
+  const workers=db.workers.map(w=>w===worker?{...worker,documents}:w);
+  return commitPayrollChange({...db,workers});
+}
+async function startPayroll(){
+  const status=document.createElement('p');
+  status.setAttribute('role','status');
+  status.style.padding='16px';
+  status.textContent='جارٍ فتح بيانات برنامج الرواتب…';
+  document.body.append(status);
+  try{
+    await loadPayroll();
+    render();
+    status.remove();
+  }catch(error){
+    status.textContent='تعذّر فتح بيانات الرواتب. أغلق أي نسخة ثانية من البرنامج ثم حاول مرة ثانية. ';
+    const retry=document.createElement('button');
+    retry.textContent='إعادة المحاولة';
+    retry.onclick=()=>location.reload();
+    status.append(retry);
+  }
+}
+let tab='workers',selected=null,period=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');const $=id=>document.getElementById(id),fmt=n=>Math.round(Number(n)||0).toLocaleString('en-US')+' د.ع',esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const eligible=w=>{let first=period+'-01',last=period+'-'+String(new Date(+period.slice(0,4),+period.slice(5),0).getDate()).padStart(2,'0');return (!w.start||w.start<=last)&&(!w.endDate||w.endDate>=first)&&(!(!w.endDate&&w.active===false))};const monthOps=(id)=>db.ops.filter(o=>o.worker===id&&o.date.slice(0,7)===period);function calc(w){let ops=monthOps(w.id),sum=t=>ops.filter(o=>o.type===t).reduce((a,o)=>a+(Number(o.amount)||0),0),year=Number(period.slice(0,4)),month=Number(period.slice(5,7)),days=new Date(year,month,0).getDate(),base=Number(w.salary)||0,first=period+'-01',last=period+'-'+String(days).padStart(2,'0'),from=w.start&&w.start>first?w.start:first,to=w.endDate&&w.endDate<last?w.endDate:last,eligibleDays=from<=to?Math.max(0,(Date.UTC(+to.slice(0,4),+to.slice(5,7)-1,+to.slice(8,10))-Date.UTC(+from.slice(0,4),+from.slice(5,7)-1,+from.slice(8,10)))/86400000+1):0,earned=Math.round(base*eligibleDays/30),advance=sum('advance'),safri=sum('safri'),deductions=sum('deduct'),absenceDays=ops.filter(o=>o.type==='absence').reduce((a,o)=>a+(Number(o.days)||0),0),absence=ops.filter(o=>o.type==='absence').reduce((a,o)=>a+(o.manual?Number(o.amount)||0:base/30*(Number(o.days)||0)),0),deduct=deductions+absence,bonus=sum('bonus'),paid=sum('paid');return{earned,eligibleDays,monthDays:days,absenceDays,advance,safri,deduct,deductions,absence,bonus,paid,remaining:earned+bonus-advance-safri-deduct-paid,ops}}function card(label,value){return `<div class="metric"><small>${label}</small><strong>${fmt(value)}</strong></div>`}function render(){let active=db.workers.filter(w=>w.active!==false),tot=active.map(calc);$('summary').innerHTML=`<div class="stat"><small>العمال النشطون</small><strong>${active.length}</strong></div><div class="stat"><small>الرواتب الأساسية</small><strong>${fmt(active.reduce((a,w)=>a+Number(w.salary),0))}</strong></div><div class="stat"><small>السلف لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.advance,0))}</strong></div><div class="stat"><small>الخصومات لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.deductions,0))}</strong></div><div class="stat"><small>الغياب لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.absence,0))}</strong></div>`;$('tabs').innerHTML=[['workers','العمال'],['salaries','الرواتب'],['log','السجل'],['settings','الإعدادات'],['backup','النسخ الاحتياطي'],['ai','مساعد ChatGPT']].map(([t,n])=>`<button class="${tab===t?'active':''}" onclick="go('${t}')">${n}</button>`).join('');let html='';if(tab==='workers')html=selected?workerView():workersView();if(tab==='salaries')html=salariesView();if(tab==='log')html=logView();if(tab==='ai')html=aiView();if(tab==='settings')html=settingsView();if(tab==='backup')html=backupView();$('main').innerHTML=html}function go(t){tab=t;selected=null;render();scrollTo(0,0)}let workerSearch='';
 function workersView(){
   return `<section class="panel"><div class="between"><h2>سجل العمال</h2><button class="primary" onclick="editWorker()">+ إضافة عامل</button></div>
     <label for="search">بحث عن عامل</label>
@@ -51,10 +188,39 @@ function printStatement(){
  const w=window.open('','_blank');if(w){w.document.open();w.document.write(page);w.document.close()}else{alert('اسمح بفتح النوافذ المنبثقة في Safari، أو استخدم خيار مشاركة الكشف.')}
 }
 async function shareStatement(){let txt=statement();if(navigator.share){try{await navigator.share({title:'كشف حساب عامل - مطعم وكافيه أوتار',text:txt});return}catch(e){if(e.name==='AbortError')return}}try{await navigator.clipboard.writeText(txt);alert('تم نسخ الكشف. افتح واتساب والصقه، أو استخدم طباعة / حفظ PDF لإرسال الملف.')}catch(e){alert('استخدم طباعة / حفظ PDF لمشاركة الكشف')}}
-function backup(){let a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.href=url;a.download='awtar-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}async function restore(e){let file=e.target.files[0];if(!file)return;try{let d=JSON.parse(await file.text());if(!Array.isArray(d.workers)||!Array.isArray(d.ops))throw Error();if(!confirm('استبدال البيانات الحالية بالنسخة الاحتياطية؟'))return;db=d;db.trash||=[];save();render()}catch(e){alert('ملف النسخة الاحتياطية غير صالح')}}
+function backup(){let a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.href=url;a.download='awtar-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}async function restore(e){
+  const input=e.target,file=input.files[0];
+  if(!file)return;
+  input.value='';
+  let data;
+  try{data=preparePayrollData(JSON.parse(await file.text()))}
+  catch(error){alert('ملف النسخة الاحتياطية غير صالح');return}
+  if(!input.isConnected||!confirm('استبدال البيانات الحالية بالنسخة الاحتياطية؟'))return;
+  if(await commitPayrollChange(data))render();
+}
 
 const docTypes=[['workerPhoto','صورة العامل الشخصية'],['nationalFront','البطاقة الموحدة - الوجه الأمامي'],['nationalBack','البطاقة الموحدة - الوجه الخلفي'],['residence','بطاقة السكن - الوجه الأمامي'],['residenceBack','بطاقة السكن - الوجه الخلفي']];
-function openDocuments(id){let w=db.workers.find(x=>x.id===id);if(!w)return;w.documents ||= {};let fields=docTypes.map(([k,label])=>`<div class="item"><strong>${label}</strong><div style="margin:10px 0"><input type="file" accept="image/*" capture="environment" onchange="saveDocument(event,'${id}','${k}')"></div>${w.documents[k]?`<img src="${w.documents[k]}" style="max-width:100%;max-height:200px;object-fit:contain;border-radius:8px"><div><button onclick="deleteDocument('${id}','${k}')">حذف الصورة</button></div>`:'<div class="muted">لم تُرفع صورة بعد</div>'}</div>`).join('');modal(`<div class="between"><h2>مستمسكات ${esc(w.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div><p class="muted">يمكن تصوير العامل مباشرة بكاميرا الآيفون أو اختيار صورته من الألبوم، وكذلك المستمسكات. الصور محفوظة محلياً على هذا الجهاز وتدخل ضمن النسخة الاحتياطية.</p>${fields}<button class="primary" onclick="printDocuments('${id}')">معاينة وطباعة المستمسكات بورقة واحدة</button>`)}
+function openDocuments(id){
+  const worker=db.workers.find(w=>w.id===id);
+  if(!worker)return;
+  const fields=docTypes.map(([key,label])=>{
+    const photo=worker.documents?.[key];
+    const handler=`saveDocument(event,'${id}','${key}')`;
+    return `<div class="item"><strong>${label}</strong>
+      <div class="actions" style="margin:10px 0">
+        <button type="button" onclick="document.getElementById('gallery-${key}').click()">اختيار من الاستوديو</button>
+        <input hidden id="gallery-${key}" type="file" accept="image/*" onchange="${handler}">
+        <button type="button" onclick="document.getElementById('camera-${key}').click()">فتح الكاميرا</button>
+        <input hidden id="camera-${key}" type="file" accept="image/*" capture="${key==='workerPhoto'?'user':'environment'}" onchange="${handler}">
+      </div>
+      ${photo?`<img src="${esc(photo)}" style="max-width:100%;max-height:200px;object-fit:contain;border-radius:8px">
+        <div><button onclick="deleteDocument('${id}','${key}')">حذف الصورة</button></div>`:'<div class="muted">لم تُرفع صورة بعد</div>'}
+    </div>`;
+  }).join('');
+  modal(`<div class="between"><h2>مستمسكات ${esc(worker.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div>
+    <p class="muted">تقدر تقصّ الصورة قبل الحفظ. الصور محفوظة على هذا الجهاز وتدخل ضمن النسخة الاحتياطية.</p>
+    ${fields}<button class="primary" onclick="printDocuments('${id}')">معاينة وطباعة المستمسكات بورقة واحدة</button>`);
+}
 function saveDocument(e,id,k){
   const input=e.target,file=input.files?.[0];
   if(!file)return;
@@ -74,7 +240,7 @@ function saveDocument(e,id,k){
 function openDocumentCrop(im,id,k){
   const edges=[['left','يسار'],['right','يمين'],['top','أعلى'],['bottom','أسفل']];
   modal(`<div class="between"><h2>قصّ الصورة</h2><button id="cropCancel">إلغاء</button></div>
-    <p class="muted">حرّك الأشرطة حتى يبقى المستمسك داخل الإطار، وبعدها اضغط حفظ الصورة.</p>
+    <p class="muted">حرّك الأشرطة حتى تبقى الصورة المطلوبة داخل الإطار، وبعدها اضغط حفظ الصورة.</p>
     <div id="cropPreview" dir="ltr" style="position:relative;overflow:hidden;margin:0 auto;width:fit-content;max-width:100%">
       <div id="cropFrame" style="position:absolute;inset:0;border:2px solid #fff;box-shadow:0 0 0 100vmax #0009;pointer-events:none"></div>
     </div>
@@ -102,38 +268,37 @@ function openDocumentCrop(im,id,k){
     updateFrame();
   };
   document.getElementById('cropCancel').onclick=()=>openDocuments(id);
-  document.getElementById('cropSave').onclick=()=>{
+  document.getElementById('cropSave').onclick=async()=>{
     const left=Number(controls.left.value),right=Number(controls.right.value);
     const top=Number(controls.top.value),bottom=Number(controls.bottom.value);
     const width=im.naturalWidth*(100-left-right)/100,height=im.naturalHeight*(100-top-bottom)/100;
-    const scale=Math.min(1,1300/Math.max(width,height)),canvas=document.createElement('canvas');
+    const maxEdge=k==='workerPhoto'?640:1300;
+    const scale=Math.min(1,maxEdge/Math.max(width,height)),canvas=document.createElement('canvas');
     canvas.width=Math.max(1,Math.round(width*scale));
     canvas.height=Math.max(1,Math.round(height*scale));
     const ctx=canvas.getContext('2d');
     ctx.fillStyle='#fff';
     ctx.fillRect(0,0,canvas.width,canvas.height);
     ctx.drawImage(im,im.naturalWidth*left/100,im.naturalHeight*top/100,width,height,0,0,canvas.width,canvas.height);
-    const w=db.workers.find(x=>x.id===id);
-    if(!w)return;
-    w.documents ||= {};
-    const old=w.documents[k];
-    w.documents[k]=canvas.toDataURL('image/jpeg',.72);
-    try{localStorage.setItem(KEY,JSON.stringify(db))}
-    catch(err){
-      if(old)w.documents[k]=old;else delete w.documents[k];
-      alert('تعذّر حفظ الصورة. جرّب قصّ مساحة أكبر حول البطاقة، أو احفظ نسخة احتياطية واحذف الصور غير اللازمة.');
-      return;
+    if(await changeDocument(id,k,canvas.toDataURL('image/jpeg',.72))){
+      render();
+      openDocuments(id);
     }
-    openDocuments(id);
   };
 }
-function deleteDocument(id,k){if(!confirm('حذف صورة المستمسك؟'))return;let w=db.workers.find(x=>x.id===id);delete w.documents[k];save();openDocuments(id)}
+async function deleteDocument(id,k){
+  if(!confirm('حذف صورة المستمسك؟'))return;
+  if(await changeDocument(id,k,null)){
+    render();
+    openDocuments(id);
+  }
+}
 function printDocuments(id){let w=db.workers.find(x=>x.id===id);let blocks=docTypes.map(([k,label])=>`<div style="margin:12px 0;text-align:center;break-inside:avoid"><strong>${label}</strong><div>${w.documents?.[k]?`<img src="${w.documents[k]}" style="display:block;margin:8px auto;max-width:100%;max-height:220px;object-fit:contain">`:'لم يتم رفع المستمسك'}</div></div>`).join('');modal(`<div class="between no-print"><h2>معاينة المستمسكات</h2><button onclick="closeModal()">إغلاق ×</button></div><div class="statement-sheet" id="statementSheet" dir="rtl"><div class="statement-head"><h2>مطعم وكافيه أوتار</h2><h1>مستمسكات العامل</h1></div><p>اسم العامل: <b>${esc(w.name)}</b></p>${blocks}</div><button class="primary no-print" onclick="printStatement()">طباعة / حفظ PDF</button>`)}
 function editSchedule(id){let w=db.workers.find(x=>x.id===id);if(!w)return;modal(`<div class="between"><h2>أوقات دوام ${esc(w.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div><form onsubmit="saveSchedule(event,'${id}')"><label>بداية الدوام (12 ساعة)</label>${time12Fields('shiftStart',w.shiftStart||'09:00')}<label>نهاية الدوام (12 ساعة)</label>${time12Fields('shiftEnd',w.shiftEnd||'17:00')}<label>أيام الدوام</label><input name="workDays" placeholder="مثلاً: السبت إلى الخميس" value="${esc(w.workDays||'')}"><label>الاستراحة والملاحظات</label><textarea name="shiftNote">${esc(w.shiftNote||'')}</textarea><p><button type="submit" class="primary">حفظ أوقات الدوام</button></p></form>`)}
 function saveSchedule(e,id){e.preventDefault();let w=db.workers.find(x=>x.id===id),f=e.target;w.shiftStart=time24(f,'shiftStart');w.shiftEnd=time24(f,'shiftEnd');for(let k of ['workDays','shiftNote'])w[k]=f.elements[k].value;save();closeModal();render()}
 function showContract(id){let w=db.workers.find(x=>x.id===id);if(!w)return;modal(`<div class="between no-print"><h2>عقد العمل</h2><button onclick="closeModal()">إغلاق ×</button></div><div class="statement-sheet" id="statementSheet" dir="rtl"><div class="statement-head"><h2>مطعم وكافيه أوتار</h2><h1>نموذج عقد عمل</h1></div><p>تم الاتفاق بين إدارة مطعم وكافيه أوتار والعامل <b>${esc(w.name)}</b> على العمل بوظيفة <b>${esc(w.job||'غير محدد')}</b> اعتباراً من <b>${esc(dateDMY(w.start))}</b>.</p><table class="statement-table"><tr><td>الراتب الأساسي</td><td>${fmt(w.salary)}</td></tr><tr><td>بداية الدوام</td><td>${format12(w.shiftStart)}</td></tr><tr><td>نهاية الدوام</td><td>${format12(w.shiftEnd)}</td></tr><tr><td>أيام العمل</td><td>${esc(w.workDays||'غير محدد')}</td></tr><tr><td>ملاحظات الدوام</td><td>${esc(w.shiftNote||'لا توجد')}</td></tr></table><p>تخضع شروط العمل والإجازات والحقوق والالتزامات للقانون العراقي والاتفاق المكتوب بين الطرفين. هذا نموذج أولي يستلزم استكمال البنود ومراجعته قبل التوقيع.</p><div style="display:flex;justify-content:space-between;margin-top:55px"><span>توقيع العامل: __________</span><span>توقيع الإدارة: __________</span></div></div><div class="no-print"><button class="primary" onclick="printStatement()">طباعة / حفظ PDF</button></div>`)}
 
-function saveBusiness(){db.config.business=$('businessName').value.trim()||'مطعم وكافيه أوتار';save();render();alert('تم الحفظ')}
+async function saveBusiness(){db.config.business=$('businessName').value.trim()||'مطعم وكافيه أوتار';if(await save()){render();alert('تم الحفظ')}}
 function addDepartment(){let x=prompt('اسم القسم الجديد');if(!x?.trim())return;db.config.departments.push(x.trim());save();render()}
 function renameDepartment(i){let old=db.config.departments[i],x=prompt('تعديل اسم القسم',old);if(!x?.trim())return;db.config.departments[i]=x.trim();db.workers.forEach(w=>{if(w.department===old)w.department=x.trim()});save();render()}
 function removeDepartment(i){if(!confirm('حذف القسم من القائمة؟ لن تُحذف بيانات العمال'))return;db.config.departments.splice(i,1);save();render()}
@@ -166,7 +331,7 @@ function messagesView(){return `<section class="panel"><h2>إرسال SMS للج
 function drawSmsResults(){if(!$('smsResults')||!smsResult)return;$('smsResults').innerHTML='<h3>نتيجة طلب الإرسال</h3>'+smsResult.map(r=>`<div class="item"><bdi>${esc(r.phone)}</bdi> — ${esc(r.state==='accepted'?'قبلت الخدمة الطلب — ليس تأكيد تسليم':r.state==='unknown'?'النتيجة غير مؤكدة؛ راجع لوحة الخدمة قبل إعادة الإرسال':'رفضت الخدمة الطلب')}${r.code?' ('+esc(r.code)+')':''}</div>`).join('')}
 async function sendAllSms(){if(smsBusy)return;let text=$('smsText').value.trim(),token=$('smsAccess').value.trim(),r=smsRecipients();if(!text||!token){alert('اكتب الرسالة ورمز الإرسال');return}if(!r.valid.length){alert('لا توجد أرقام صالحة');return}if(r.valid.length>500){alert('الحد الأقصى 500 رقم في الدفعة');return}if(location.protocol==='file:'){alert('الإرسال يحتاج تشغيل النسخة على استضافة تدعم الخادم؛ فتح HTML وحده لا يكفي');return}let preview=`إرسال مدفوع إلى ${r.valid.length} رقم؟\nالمكرر المستبعد: ${r.duplicates}\nالأرقام الناقصة أو غير الصالحة: ${r.invalid.length}${r.invalid.length?'\n'+r.invalid.join('، '):''}\n\n${text}`;if(!confirm(preview))return;let payload=JSON.stringify({text,phones:r.valid.map(x=>x.phone)});if(payload!==smsLastPayload){smsBatchId=crypto.randomUUID();smsLastPayload=payload}smsBusy=true;$('smsSend').disabled=true;$('smsResults').textContent='جارٍ إرسال الطلب… لا تغلق الصفحة.';try{let res=await fetch('/api/sms',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({...JSON.parse(payload),id:smsBatchId})});let data=await res.json();if(!res.ok)throw Error(data.error||'تعذر الإرسال');smsResult=data.results;drawSmsResults();if(smsResult.every(x=>x.state==='failed')){smsLastPayload=''}else{$('smsResults').insertAdjacentHTML('beforeend','<p>نفس الرسالة ونفس القائمة تستخدم رقم الدفعة ذاته لتجنب التكرار. لإرسال جديد مقصود اضغط الزر أدناه.</p><button onclick="if(confirm(\'إنشاء دفعة جديدة قد يكرر الرسالة ويضيف كلفة. متأكد؟\')){smsLastPayload=\'\';this.disabled=true}">السماح بدفعة جديدة</button>')}}catch(e){$('smsResults').textContent='تعذر تأكيد النتيجة: '+e.message+' . أعد المحاولة بنفس النص والقائمة لاسترجاع نفس الدفعة؛ لا تغيّر النص قبل مراجعة الخدمة.'}finally{smsBusy=false;if($('smsSend'))$('smsSend').disabled=false}}
 
-render();
+startPayroll();
 
 </script></body></html>
 
