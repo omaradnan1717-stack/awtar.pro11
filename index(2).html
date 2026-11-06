@@ -1,0 +1,333 @@
+<!doctype html><html lang="ar" dir="rtl"><head><style>body:not(.app-open)>header,body:not(.app-open)>nav,body:not(.app-open)>main{display:none}#loginroot{padding:16px}@media print{body:not(.app-open)>*{display:none!important}}</style><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><title>AWTAR STAFF PRO</title><style>:root{--g:#17382d;--p:#e8efea;--bg:#f4f6f4;--mut:#6d8276}*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Tahoma,sans-serif;color:#203b30}header{background:var(--g);color:white;padding:30px 16px 20px}header h1{margin:0;color:#e7cba3;font-size:27px}header p{margin:5px 0 22px;color:#c4d4cb}.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}.stat{background:#2b4d40;border-radius:13px;padding:15px 12px}.stat small,.metric small{display:block;color:#d5e1d9;font-size:13px}.stat strong,.metric strong{display:block;font-size:22px;margin-top:8px;overflow-wrap:anywhere}.tabs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px;margin:15px 12px}.tabs button{padding:14px 2px;font-size:15px}.tabs .active,button.primary{background:var(--g);color:#fff}button{border:0;border-radius:11px;background:var(--p);color:var(--g);padding:12px 14px;font-size:15px;cursor:pointer}button.danger{background:#a33439;color:#fff}button:disabled{opacity:.45}.wrap{padding:0 12px 60px;max-width:800px;margin:auto}.panel{background:white;border:1px solid #dce5dd;border-radius:17px;padding:17px;margin:12px 0;box-shadow:0 1px 3px #00000009}h2{font-size:22px;margin:4px 0 17px}h3{font-size:18px;margin:12px 0}.between{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}.metric{background:#eff3ef;padding:15px;border-radius:12px}.metric small{color:var(--mut)}.metric strong{font-size:20px}.big{background:#eff3ef;text-align:center;padding:20px;border-radius:12px;margin:16px 0}.big strong{display:block;font-size:30px}label{display:block;color:#526d5c;margin:13px 0 6px}input,select,textarea{width:100%;border:1px solid #cad8cd;border-radius:11px;padding:13px;font-size:17px;background:#fff;color:#203b30;font-family:inherit}textarea{min-height:70px}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:12px 0}.actions button{font-weight:650;padding:16px 8px}.item{border-bottom:1px solid #e4ebe5;padding:14px 0}.item:last-child{border:0}.muted{color:var(--mut);font-size:13px}.pill{background:#eaf1eb;padding:5px 9px;border-radius:30px;font-size:12px}.hidden{display:none!important}.overlay{position:fixed;inset:0;background:#0009;display:flex;align-items:center;justify-content:center;padding:14px;z-index:20}.modal{background:white;border-radius:19px;padding:19px;width:100%;max-width:480px;max-height:90vh;overflow:auto}.modal h2{font-size:21px}.dategrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.dategrid input{padding:11px 5px;text-align:center}.smallbtn{padding:8px;font-size:13px}.empty{text-align:center;padding:35px 5px;color:var(--mut)}@media print{header,.tabs,.no-print,.overlay{display:none!important}body{background:white}.panel{box-shadow:none;border:0}.wrap{max-width:none}}
+.awtar-cal{position:fixed;inset:0;background:#0008;z-index:99999;display:flex;align-items:center;justify-content:center;padding:16px}.awtar-cal-box{background:#fff;border-radius:20px;padding:18px;width:min(370px,100%);direction:rtl;box-shadow:0 15px 45px #0003}.awtar-cal-head{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:16px}.awtar-cal-head button,.awtar-cal-grid button{border:0;background:#edf2ee;border-radius:10px;padding:10px;color:#17382d}.awtar-cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;text-align:center}.awtar-cal-grid button{padding:11px 0;font-size:15px}.awtar-cal-grid .chosen{background:#17382d;color:white}.awtar-cal-grid span{font-size:12px;color:#627568;padding:8px 0}.awtar-cal-actions{display:flex;justify-content:space-between;margin-top:16px}.awtar-cal-actions button{border:0;border-radius:9px;padding:10px 18px;background:#e8efea;color:#17382d}.awtar-cal-actions button:last-child{background:#17382d;color:white}
+</style><style>.statement-sheet{color:#18372b;background:white;padding:8px 0;font-size:14px}.statement-head{text-align:center;border-bottom:3px solid #17382d;padding-bottom:15px;margin-bottom:15px}.statement-head h2{font-size:22px;margin:0 0 8px}.statement-head h1{font-size:24px;margin:14px 0 0}.statement-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.statement-table{border-collapse:collapse;width:100%;font-size:14px}.statement-table td,.statement-table th{border:1px solid #cddbd1;padding:11px 8px;text-align:right}.statement-table td:last-child{white-space:nowrap}.statement-total{background:#edf3ee;border:1px solid #c9dccc;border-radius:10px;text-align:center;padding:17px;margin:18px 0;font-size:18px}.statement-note{background:#fff7e6;padding:13px;border-radius:9px;line-height:1.8}@media print{body.printing-statement header,body.printing-statement nav,body.printing-statement main{display:none!important}body.printing-statement .overlay{display:block!important;position:static!important;background:white!important;padding:0!important}body.printing-statement .modal{display:block!important;max-height:none!important;max-width:none!important;width:100%!important;overflow:visible!important;padding:0!important}body.printing-statement .no-print{display:none!important}body.printing-statement .statement-sheet{display:block!important}body.printing-statement{background:white!important}}</style>
+<link rel="apple-touch-icon" href="./EAA22950-3580-4F02-B8F1-5DC375E0C210.png">
+<link rel="icon" type="image/png" href="./EAA22950-3580-4F02-B8F1-5DC375E0C210.png">
+</head><body><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
+const KEY='awtar_staff_pro_v4';
+let db, storage, revision, pendingSave=Promise.resolve();
+function preparePayrollData(data){
+  if(!Array.isArray(data?.workers)||!Array.isArray(data.ops))throw Error('بيانات البرنامج غير صالحة');
+  data.trash ||= [];
+  data.config ||= {departments:['المطبخ','الصالة','الكافيه','الإدارة'],fields:[],business:'مطعم وكافيه أوتار'};
+  return data;
+}
+// Keep backup files and the UI in data-URL format, but store image bytes in IndexedDB.
+function mapPayrollImages(data, convert){
+  const mapWorkers=workers=>Promise.all(workers.map(async worker=>{
+    if(!worker.documents)return worker;
+    const entries=await Promise.all(Object.entries(worker.documents).map(async ([key,image])=>[
+      key, await convert(image)
+    ]));
+    return {...worker,documents:Object.fromEntries(entries)};
+  }));
+  return Promise.all([mapWorkers(data.workers),mapWorkers(data.trash)]).then(([workers,trash])=>({
+    ...data,workers,trash
+  }));
+}
+function packPayrollImage(image){
+  const match=typeof image==='string'&&/^data:(image\/[\w.+-]+);base64,([A-Za-z0-9+/=]+)$/i.exec(image);
+  if(!match)return image;
+  const binary=atob(match[2]);
+  const bytes=Uint8Array.from(binary,character=>character.charCodeAt(0));
+  return new Blob([bytes],{type:match[1]});
+}
+function unpackPayrollImage(image){
+  if(!(image instanceof Blob))return image;
+  return new Promise((resolve,reject)=>{
+    const reader=new FileReader();
+    reader.onload=()=>resolve(reader.result);
+    reader.onerror=()=>reject(reader.error);
+    reader.readAsDataURL(image);
+  });
+}
+function payrollTransaction(update){
+  return new Promise((resolve,reject)=>{
+    const transaction=storage.transaction('state','readwrite');
+    const store=transaction.objectStore('state');
+    const request=store.get(KEY);
+    let result, failure;
+    request.onsuccess=()=>{
+      try{
+        result=update(request.result);
+        if(result!==request.result)store.put(result,KEY);
+      }catch(error){
+        failure=error;
+        transaction.abort();
+      }
+    };
+    transaction.oncomplete=()=>resolve(result);
+    transaction.onabort=()=>reject(failure||transaction.error||Error('تعذّر حفظ البيانات'));
+  });
+}
+async function loadPayroll(){
+  storage=await new Promise((resolve,reject)=>{
+    const request=indexedDB.open('awtar_staff_pro_storage',1);
+    request.onupgradeneeded=()=>request.result.createObjectStore('state');
+    request.onsuccess=()=>resolve(request.result);
+    request.onerror=()=>reject(request.error);
+    request.onblocked=()=>reject(Error('أغلق النسخ الأخرى من البرنامج وحاول مرة ثانية'));
+  });
+  const record=await payrollTransaction(current=>{
+    if(current)return current;
+    const legacy=localStorage.getItem(KEY);
+    const data=legacy===null?{workers:[],ops:[]}:JSON.parse(legacy);
+    return {revision:1,data:preparePayrollData(data)};
+  });
+  db=await mapPayrollImages(preparePayrollData(record.data),unpackPayrollImage);
+  revision=record.revision;
+}
+function persistPayroll(data){
+  const snapshot=JSON.parse(JSON.stringify(data));
+  const write=pendingSave.then(async()=>{
+    const packed=await mapPayrollImages(snapshot,packPayrollImage);
+    const saved=await payrollTransaction(current=>{
+      if(current?.revision!==revision)throw Error('تغيّرت البيانات في نافذة ثانية. احتفظ بنسخة احتياطية قبل إعادة فتح البرنامج.');
+      return {revision:revision+1,data:packed};
+    });
+    revision=saved.revision;
+  });
+  pendingSave=write.catch(()=>{});
+  return write;
+}
+function payrollSaveError(error){
+  alert(error.name==='QuotaExceededError'
+    ? 'مساحة تخزين الصور غير كافية. نزّل نسخة احتياطية واحذف الصور غير اللازمة.'
+    : error.message?.startsWith('تغيّرت البيانات')
+      ? error.message
+      : 'تعذّر حفظ التغيير على الجهاز. نزّل نسخة احتياطية قبل إغلاق البرنامج.');
+}
+async function save(){
+  try{await persistPayroll(db);return true}
+  catch(error){payrollSaveError(error);return false}
+}
+async function commitPayrollChange(data){
+  document.body.inert=true;
+  try{
+    await persistPayroll(data);
+    db=data;
+    return true;
+  }catch(error){
+    payrollSaveError(error);
+    return false;
+  }finally{
+    document.body.inert=false;
+  }
+}
+async function changeDocument(id,key,image){
+  const worker=db.workers.find(w=>w.id===id);
+  if(!worker)return false;
+  const documents={...worker.documents};
+  if(image)documents[key]=image;
+  else delete documents[key];
+  const workers=db.workers.map(w=>w===worker?{...worker,documents}:w);
+  return commitPayrollChange({...db,workers});
+}
+async function startPayroll(){
+  const status=document.createElement('p');
+  status.setAttribute('role','status');
+  status.style.padding='16px';
+  status.textContent='جارٍ فتح بيانات برنامج الرواتب…';
+  document.body.append(status);
+  try{
+    await loadPayroll();
+    render();
+    status.remove();
+  }catch(error){
+    status.textContent='تعذّر فتح بيانات الرواتب. أغلق البرنامج وافتحه من نفس الرابط وحاول مرة ثانية.';
+  }
+}
+let tab='workers',selected=null,period=new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');const $=id=>document.getElementById(id),fmt=n=>Math.round(Number(n)||0).toLocaleString('en-US')+' د.ع',esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const eligible=w=>{let first=period+'-01',last=period+'-'+String(new Date(+period.slice(0,4),+period.slice(5),0).getDate()).padStart(2,'0');return (!w.start||w.start<=last)&&(!w.endDate||w.endDate>=first)&&(!(!w.endDate&&w.active===false))};const monthOps=(id)=>db.ops.filter(o=>o.worker===id&&o.date.slice(0,7)===period);function calc(w){let ops=monthOps(w.id),sum=t=>ops.filter(o=>o.type===t).reduce((a,o)=>a+(Number(o.amount)||0),0),year=Number(period.slice(0,4)),month=Number(period.slice(5,7)),days=new Date(year,month,0).getDate(),base=Number(w.salary)||0,first=period+'-01',last=period+'-'+String(days).padStart(2,'0'),from=w.start&&w.start>first?w.start:first,to=w.endDate&&w.endDate<last?w.endDate:last,eligibleDays=from<=to?Math.max(0,(Date.UTC(+to.slice(0,4),+to.slice(5,7)-1,+to.slice(8,10))-Date.UTC(+from.slice(0,4),+from.slice(5,7)-1,+from.slice(8,10)))/86400000+1):0,earned=Math.round(base*eligibleDays/30),advance=sum('advance'),safri=sum('safri'),deductions=sum('deduct'),absenceDays=ops.filter(o=>o.type==='absence').reduce((a,o)=>a+(Number(o.days)||0),0),absence=ops.filter(o=>o.type==='absence').reduce((a,o)=>a+(o.manual?Number(o.amount)||0:base/30*(Number(o.days)||0)),0),deduct=deductions+absence,bonus=sum('bonus'),paid=sum('paid');return{earned,eligibleDays,monthDays:days,absenceDays,advance,safri,deduct,deductions,absence,bonus,paid,remaining:earned+bonus-advance-safri-deduct-paid,ops}}function card(label,value){return `<div class="metric"><small>${label}</small><strong>${fmt(value)}</strong></div>`}function render(){let active=db.workers.filter(w=>w.active!==false),tot=active.map(calc);$('summary').innerHTML=`<div class="stat"><small>العمال النشطون</small><strong>${active.length}</strong></div><div class="stat"><small>الرواتب الأساسية</small><strong>${fmt(active.reduce((a,w)=>a+Number(w.salary),0))}</strong></div><div class="stat"><small>السلف لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.advance,0))}</strong></div><div class="stat"><small>الخصومات لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.deductions,0))}</strong></div><div class="stat"><small>الغياب لهذا الشهر</small><strong>${fmt(tot.reduce((a,c)=>a+c.absence,0))}</strong></div>`;$('tabs').innerHTML=[['workers','العمال'],['salaries','الرواتب'],['log','السجل'],['settings','الإعدادات'],['backup','النسخ الاحتياطي'],['ai','مساعد ChatGPT']].map(([t,n])=>`<button class="${tab===t?'active':''}" onclick="go('${t}')">${n}</button>`).join('');let html='';if(tab==='workers')html=selected?workerView():workersView();if(tab==='salaries')html=salariesView();if(tab==='log')html=logView();if(tab==='ai')html=aiView();if(tab==='settings')html=settingsView();if(tab==='backup')html=backupView();$('main').innerHTML=html}function go(t){tab=t;selected=null;render();scrollTo(0,0)}let workerSearch='';
+function workersView(){
+  return `<section class="panel"><div class="between"><h2>سجل العمال</h2><button class="primary" onclick="editWorker()">+ إضافة عامل</button></div>
+    <label for="search">بحث عن عامل</label>
+    <input type="search" placeholder="اكتب اسم العامل أو جزء منه" id="search" value="${esc(workerSearch)}" oninput="filterWorkers()">
+    <div id="workerlist" aria-live="polite">${workerList(false)}</div>
+  </section><section class="panel"><h3>العمال المنتهية خدماتهم</h3><div id="formerWorkerList" aria-live="polite">${workerList(true)}</div></section>`;
+}
+function normalizeWorkerName(name){
+  return String(name ?? '').toLowerCase().replace(/[\u064B-\u065F\u0670ـ]/g,'').replace(/[أإآٱ]/g,'ا').replace(/ى/g,'ي').trim().replace(/\s+/g,' ');
+}
+function workerList(former){
+  const query=normalizeWorkerName(workerSearch);
+  const workers=db.workers.filter(w=>(w.active===false)===former && normalizeWorkerName(w.name).includes(query));
+  if(!workers.length){
+    const message=query?'ماكو عامل يطابق البحث':former?'لا يوجد':'لا يوجد عمال. أضف أول عامل.';
+    return `<div class="empty">${message}</div>`;
+  }
+  return workers.map(w=>`<div class="item between"><div><strong>${esc(w.name)}</strong>
+    <div class="muted">${former?'تاريخ الإنهاء: '+esc(dateDMY(w.endDate)):esc(w.job||'عامل')+' · راتب شهري '+fmt(w.salary)}</div>
+    </div><button onclick="selected='${w.id}';render();scrollTo(0,0)">${former?'فتح الملف':'فتح الحساب ←'}</button></div>`).join('');
+}
+function filterWorkers(){
+  workerSearch=$('search').value;
+  $('workerlist').innerHTML=workerList(false);
+  $('formerWorkerList').innerHTML=workerList(true);
+}
+function dateDMY(s){if(!s)return 'غير محدد';let m=String(s).match(/^(\d{4})-(\d{2})-(\d{2})$/);return m?m[3]+'/'+m[2]+'/'+m[1]:s}function dateFields(key,val){let a=(val||new Date().toLocaleDateString('en-CA')).split('-');return `<div class="dategrid"><input aria-label="اليوم" name="${key}Day" type="number" min="1" max="31" placeholder="يوم" value="${+a[2]}"><input aria-label="الشهر" name="${key}Month" type="number" min="1" max="12" placeholder="شهر" value="${+a[1]}"><input aria-label="السنة" name="${key}Year" type="number" min="2000" max="2100" placeholder="سنة" value="${+a[0]}"></div><button type="button" onclick="openNumericCalendar(this,'${key}')">📅 اختيار من التقويم (شهر رقمي)</button><small>اليوم / الشهر / السنة</small>`}
+let awtarCalState=null;
+function openNumericCalendar(btn,key){let form=btn.closest('form'),y=Number(form.elements[key+'Year'].value)||new Date().getFullYear(),m=Number(form.elements[key+'Month'].value)||new Date().getMonth()+1,d=Number(form.elements[key+'Day'].value)||1;awtarCalState={form,key,y,m,d};drawNumericCalendar()}
+function shiftNumericCalendar(n){let c=awtarCalState,t=new Date(c.y,c.m-1+n,1);c.y=t.getFullYear();c.m=t.getMonth()+1;drawNumericCalendar()}
+function chooseNumericDay(d){let c=awtarCalState;c.d=d;c.form.elements[c.key+'Day'].value=d;c.form.elements[c.key+'Month'].value=c.m;c.form.elements[c.key+'Year'].value=c.y;closeNumericCalendar()}
+function closeNumericCalendar(){document.getElementById('awtarCalendar')?.remove();awtarCalState=null}
+function drawNumericCalendar(){let c=awtarCalState;if(!c)return;let first=new Date(c.y,c.m-1,1).getDay(),days=new Date(c.y,c.m,0).getDate(),names=['أحد','اثنين','ثلاثاء','أربعاء','خميس','جمعة','سبت'];let cells=names.map(n=>`<span>${n}</span>`).join('')+Array.from({length:first},()=>'<span></span>').join('')+Array.from({length:days},(_,i)=>`<button type="button" class="${i+1===c.d?'chosen':''}" onclick="chooseNumericDay(${i+1})">${i+1}</button>`).join('');document.getElementById('awtarCalendar')?.remove();let el=document.createElement('div');el.id='awtarCalendar';el.className='awtar-cal';el.onclick=e=>{if(e.target===el)closeNumericCalendar()};el.innerHTML=`<div class="awtar-cal-box"><div class="awtar-cal-head"><button type="button" onclick="shiftNumericCalendar(-1)">❮</button><strong>${String(c.m).padStart(2,'0')}/${c.y}</strong><button type="button" onclick="shiftNumericCalendar(1)">❯</button></div><div class="awtar-cal-grid">${cells}</div><div class="awtar-cal-actions"><button type="button" onclick="closeNumericCalendar()">إلغاء</button><button type="button" onclick="chooseNumericDay(${Math.min(c.d,days)})">تأكيد</button></div></div>`;document.body.appendChild(el)}
+function readDate(f,key){let y=+f.elements[key+'Year'].value,m=+f.elements[key+'Month'].value,d=+f.elements[key+'Day'].value;if(y<2000||y>2100||m<1||m>12||d<1||d>new Date(y,m,0).getDate())return null;return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`}function format12(t){if(!t)return 'غير محدد';let a=t.split(':'),h=+a[0];return `${h%12||12}:${a[1]} ${h>=12?'م':'ص'}`}function time12Fields(key,val){let [hh,mm]=(val||'09:00').split(':'),h=+hh;return `<div class="dategrid"><select name="${key}Hour">${Array.from({length:12},(_,i)=>`<option value="${i+1}" ${h%12===(i+1)%12?'selected':''}>${i+1}</option>`).join('')}</select><select name="${key}Minute">${['00','15','30','45'].concat([mm]).filter((v,i,a)=>a.indexOf(v)===i).map(v=>`<option value="${v}" ${mm===v?'selected':''}>${v}</option>`).join('')}</select><select name="${key}Period"><option value="AM" ${h<12?'selected':''}>صباحاً</option><option value="PM" ${h>=12?'selected':''}>مساءً</option></select></div>`}function time24(f,k){let h=+f.elements[k+'Hour'].value%12;if(f.elements[k+'Period'].value==='PM')h+=12;return String(h).padStart(2,'0')+':'+f.elements[k+'Minute'].value}
+function workerView(){let w=db.workers.find(x=>x.id===selected);if(!w){selected=null;return workersView()}let c=calc(w);return `<section class="panel"><div class="between no-print"><button onclick="selected=null;render()">→ العمال</button><div style="display:flex;gap:8px;flex-wrap:wrap"><button onclick="editWorker('${w.id}')">تعديل بيانات العامل</button><button class="primary" onclick="openDocuments('${w.id}')">📷 مستمسكات العامل</button></div></div><h2>${esc(w.name)}</h2>${w.documents?.workerPhoto?`<img src="${w.documents.workerPhoto}" alt="صورة العامل" style="width:105px;height:105px;object-fit:cover;border-radius:50%;border:3px solid #d6e3d9;margin:8px 0">`:''}${w.active===false?`<p class="muted">منتهية خدماته بتاريخ ${esc(dateDMY(w.endDate))} · ${esc(w.endReason||'')}</p>`:''}<div class="muted">${esc(w.job||'عامل')} | ${esc(w.department||'')} | ${esc(w.phone||'')} | المباشرة: ${esc(dateDMY(w.start))}</div><div class="big"><small>المتبقي لهذا الشهر (${period.slice(5,7)+"/"+period.slice(0,4)})</small><strong>${fmt(c.remaining)}</strong></div><p class="muted">الراتب الشهري الأساسي: ${fmt(w.salary)} · أيام الاستحقاق: ${c.eligibleDays} من ${c.monthDays} يوم · قيمة اليوم: ${fmt(Number(w.salary)/30)} · أيام الغياب المسجلة: ${c.absenceDays}</p><div class="grid">${card('راتب المدة المستحق',c.earned)}${card('السلف',c.advance)}${card('السفري (أكل)',c.safri)}${card('الخصومات',c.deductions)}${card('الغياب',c.absence)}${card('المكافآت',c.bonus)}${card('المدفوع فعلياً',c.paid)}</div><div class="no-print"><h3>ملف العامل · أوقات الدوام والعقد</h3><div class="item"><strong>أوقات الدوام</strong><div class="muted">${format12(w.shiftStart)} — ${format12(w.shiftEnd)} | ${esc(w.workDays||"أيام الدوام غير محددة")}</div><div class="muted">${esc(w.shiftNote||"")}</div><button onclick="editSchedule('${w.id}')">تعديل أوقات الدوام</button> <button onclick="showContract('${w.id}')">عرض / طباعة عقد العمل</button></div><h3>مستمسكات العامل</h3><div class="item"><p class="muted">صورة العامل الشخصية والبطاقة الموحدة (أمام وخلف) وبطاقة السكن (أمام وخلف)، مع المعاينة والطباعة.</p><button onclick="openDocuments('${w.id}')">📷 فتح / رفع / طباعة المستمسكات</button></div><h3>بيانات إضافية</h3>${db.config.fields.map(f=>`<div class='item'><strong>${esc(f.label)}:</strong> ${esc((w.custom||{})[f.id]||'—')}</div>`).join('')}<h3>الإجراءات المالية</h3><div class="actions"><button onclick="openOp('advance')">+ سلفة</button><button onclick="openOp('safri')">+ سفري (أكل)</button><button onclick="openOp('absence')">+ غياب</button><button onclick="openOp('deduct')">+ خصم</button><button onclick="openOp('bonus')">+ مكافأة</button><button onclick="openOp('paid')">+ صرف راتب</button></div><h3>المستندات والمتابعة</h3><button style="width:100%" onclick="previewStatement()">كشف / وصل الراتب · عرض / مشاركة / طباعة</button><h3>حالة العامل</h3><button onclick="${w.active===false?'reactivateWorker':'terminateWorker'}('${w.id}')">${w.active===false?'إعادة التفعيل':'إنهاء الخدمات بتاريخ'}</button> <button class="danger" onclick="trashWorker('${w.id}')">نقل العامل إلى سلة المحذوفات</button></div><h3>عمليات ${period}</h3>${c.ops.length?c.ops.slice().reverse().map(opRow).join(''):'<div class="empty">لا توجد عمليات لهذا الشهر</div>'}</section>`}const names={advance:'سلفة',safri:'سفري (أكل)',absence:'غياب',deduct:'خصم',bonus:'مكافأة',paid:'صرف راتب'};function opRow(o){return `<div class="item between"><div><span class="pill">${names[o.type]}</span> <strong>${fmt(o.amount)}</strong><div class="muted">${esc(dateDMY(o.date))} · ${o.type==='safri'?esc(o.meal||'وجبة')+' · ':''}${esc(o.note||'بدون ملاحظة')}${o.type==='absence'?' · '+o.days+' يوم':''}</div></div><div class="no-print"><button class="smallbtn" onclick="openOp('${o.type}','${o.id}')">تعديل</button> <button class="danger smallbtn" onclick="removeOp('${o.id}')">حذف</button></div></div>`}function monthPicker(){return `<label>دورة الرواتب</label><input type="month" value="${period}" onchange="if(this.value){period=this.value;render()}">`}function salariesView(){return `<section class="panel"><h2>الرواتب الشهرية</h2>${monthPicker()}<div class="big"><small>إجمالي المتبقي للصرف</small><strong>${fmt(db.workers.filter(eligible).reduce((a,w)=>a+calc(w).remaining,0))}</strong></div>${db.workers.filter(eligible).map(w=>`<div class="item between"><div><strong>${esc(w.name)}</strong><div class="muted">${fmt(calc(w).remaining)}</div></div><button onclick="selected='${w.id}';tab='workers';render()">التفاصيل</button></div>`).join('')}<button class="primary" onclick="previewPayroll()">كشف حساب الرواتب · عرض / طباعة</button></section>`}function previewPayroll(){let ws=db.workers.filter(eligible),keys=['earned','advance','safri','absence','deductions','bonus','paid','remaining'],tot=Object.fromEntries(keys.map(k=>[k,0]));let rows=ws.map((w,i)=>{let c=calc(w);keys.forEach(k=>tot[k]+=c[k]||0);return `<tr><td>${i+1}</td><td>${esc(w.name)}</td>${keys.map(k=>`<td>${Math.round(c[k]||0).toLocaleString('en-US')}</td>`).join('')}</tr>`}).join('');let html=`<div class="statement-sheet" id="statementSheet" dir="rtl"><div class="statement-head"><h2>${esc(db.config.business||'مطعم وكافيه أوتار')}</h2><h1>كشف حساب الرواتب الشهري</h1><p>الدورة: ${esc(period)} | عدد العمال: ${ws.length}</p></div><div style="overflow-x:auto"><table class="statement-table"><thead><tr><th>#</th><th>العامل</th><th>راتب المدة المستحق</th><th>السلف</th><th>السفري</th><th>الغياب</th><th>الخصومات</th><th>المكافآت</th><th>المصروف</th><th>المتبقي</th></tr></thead><tbody>${rows||'<tr><td colspan="10">لا يوجد عمال</td></tr>'}<tr><th colspan="2">المجموع</th>${keys.map(k=>`<th>${Math.round(tot[k]||0).toLocaleString('en-US')}</th>`).join('')}</tr></tbody></table></div><p class="statement-note">جميع المبالغ بالدينار العراقي. كشف للمراجعة وليس إيصال استلام رواتب.</p></div>`;modal(`<div class="between no-print"><h2>معاينة كشف الرواتب</h2><button onclick="closeModal()">إغلاق ×</button></div>${html}<div class="actions no-print"><button class="primary" onclick="printStatement()">طباعة / حفظ PDF</button><button onclick="sharePayroll()">مشاركة الكشف</button></div>`)}
+async function sharePayroll(){let content=`${db.config.business||'مطعم وكافيه أوتار'}\nكشف رواتب ${period}\n`+db.workers.filter(eligible).map(w=>`${w.name}: ${fmt(calc(w).remaining)}`).join('\n');if(navigator.share){try{await navigator.share({title:'كشف الرواتب',text:content});return}catch(e){if(e.name==='AbortError')return}}try{await navigator.clipboard.writeText(content);alert('تم نسخ الكشف، افتح واتساب والصقه.')}catch(e){prompt('انسخ كشف الرواتب:',content)}}
+function logView(){let ops=db.ops.filter(o=>o.date.slice(0,7)===period);return `<section class="panel"><h2>سجل العمليات والمراجعة</h2>${monthPicker()}${ops.length?ops.slice().reverse().map(o=>`<div class="item"><strong>${esc(db.workers.find(w=>w.id===o.worker)?.name||'عامل محذوف')}</strong> · ${names[o.type]}<div>${fmt(o.amount)} · ${esc(dateDMY(o.date))}${o.type==='safri'?' · '+esc(o.meal||'وجبة'):''}</div><div class="muted">${esc(o.note||'بدون ملاحظات')}</div></div>`).join(''):'<div class="empty">لا توجد عمليات</div>'}<button onclick="window.print()">طباعة السجل</button></section>`}function settingsView(){return `<section class="panel"><h2>لوحة تحكم المدير</h2><p class='muted'>إضافة أقسام وحقول جديدة لملف العامل وتعديل اسم المنشأة.</p><label>اسم المنشأة</label><input id='businessName' value='${esc(db.config.business)}'><button onclick='saveBusiness()'>حفظ الاسم</button><h3>الأقسام</h3>${db.config.departments.map((d,i)=>`<div class='item between'><span>${esc(d)}</span><button onclick='renameDepartment(${i})'>تعديل</button><button onclick='removeDepartment(${i})'>حذف</button></div>`).join('')}<button class='primary' onclick='addDepartment()'>+ إضافة قسم</button><h3>حقول إضافية للعامل</h3>${db.config.fields.map((f,i)=>`<div class='item between'><span>${esc(f.label)} (${f.type==='date'?'تاريخ':f.type==='number'?'رقم':'نص'})</span><button onclick='renameField(${i})'>تعديل</button><button onclick='removeField(${i})'>حذف</button></div>`).join('')}<button class='primary' onclick='addField()'>+ إضافة حقل</button><hr><h2>البيانات والنسخ الاحتياطي</h2><p class="muted">البيانات محفوظة محلياً على هذا المتصفح. احتفظ بنسخة احتياطية بانتظام.</p><button class="primary" onclick="backup()">تنزيل نسخة احتياطية JSON</button><label>استيراد نسخة احتياطية</label><input type="file" accept="application/json,.json" onchange="restore(event)"></section><section class="panel"><h2>سلة محذوفات العمال (${db.trash.length})</h2>${db.trash.map(w=>`<div class="item between">${esc(w.name)} <button onclick="restoreWorker('${w.id}')">استرجاع</button></div>`).join('')||'<div class="empty">السلة فارغة</div>'}</section>`}function backupView(){return `<section class="panel"><h2>النسخ الاحتياطي</h2><p>نزّل جميع بيانات العمال والرواتب والسلف والغيابات والسفريات والمستمسكات والإعدادات بملف JSON، واحفظه في تطبيق الملفات أو iCloud Drive.</p><button class="primary" onclick="backup()">تنزيل نسخة احتياطية</button><hr><h2>استرجاع نسخة احتياطية</h2><p class="muted">تنبيه: الاسترجاع يستبدل البيانات الحالية. نزّل نسخة احتياطية أولاً.</p><input type="file" accept="application/json,.json" onchange="restore(event)"><h3>معلومات الحفظ</h3><p class="muted">البيانات محفوظة داخل متصفح هذا الجهاز فقط، ولا تتزامن تلقائياً بين الأجهزة.</p></section>`}function modal(html){$('modalroot').innerHTML=`<div class="overlay" onclick="if(event.target===this)closeModal()"><div class="modal">${html}</div></div>`}function closeModal(){$('modalroot').innerHTML=''}function editWorker(id){let w=db.workers.find(x=>x.id===id)||{};modal(`<div class="between"><h2>${id?'تعديل بيانات العامل':'إضافة عامل'}</h2><button onclick="closeModal()">إغلاق ×</button></div><form onsubmit="saveWorker(event,'${id||''}')"><label>اسم العامل *</label><input name="name" required value="${esc(w.name||'')}"><label>الوظيفة</label><input name="job" value="${esc(w.job||'')}"><label>القسم</label><select name="department"><option value="">غير محدد</option>${db.config.departments.map(d=>`<option value="${esc(d)}" ${w.department===d?'selected':''}>${esc(d)}</option>`).join('')}</select>${db.config.fields.map(f=>`<label>${esc(f.label)}</label><input name="custom_${f.id}" type="${f.type}" value="${esc((w.custom||{})[f.id]||'')}">`).join('')}<label>رقم الهاتف</label><input name="phone" value="${esc(w.phone||'')}"><label>تاريخ المباشرة</label>${dateFields("start",w.start)}<label>الراتب الشهري بالدينار *</label><input name="salary" type="number" min="0" required value="${w.salary||''}"><p class="muted">الراتب شهري؛ يُحسب تلقائياً حسب تاريخ المباشرة وعدد أيام الشهر (28 أو 29 أو 30 أو 31).</p><p><button class="primary" type="submit">حفظ العامل</button></p></form>`)}function saveWorker(e,id){e.preventDefault();let f=e.target,w=db.workers.find(x=>x.id===id);if(!w){w={id:crypto.randomUUID(),active:true};db.workers.push(w)}let start=readDate(f,'start');if(!start){alert('تاريخ المباشرة غير صحيح');return}for(let k of ['name','job','phone','salary','department'])w[k]=f.elements[k].value;w.start=start;w.salary=Number(w.salary);if(!Number.isFinite(w.salary)||w.salary<0){alert('الراتب الشهري غير صحيح');return}w.salaryMode='monthly';w.custom ||= {};db.config.fields.forEach(field=>w.custom[field.id]=f.elements['custom_'+field.id]?.value||'');selected=w.id;save();closeModal();render()}function openOp(type,id){let w=db.workers.find(x=>x.id===selected),o=db.ops.find(x=>x.id===id)||{},d=(o.date||new Date().toLocaleDateString('en-CA')).split('-'),days=o.days||1,absenceMonthDays=new Date(+d[0],+d[1],0).getDate(),auto=Number(w.salary)/30*days;modal(`<div class="between"><h2>${id?'تعديل':'تسجيل'} ${names[type]} - ${esc(w.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div><form onsubmit="saveOp(event,'${type}','${id||''}')"><label>التاريخ</label><div class="dategrid"><input name="day" type="number" min="1" max="31" value="${+d[2]}"><input name="month" type="number" min="1" max="12" value="${+d[1]}" oninput="updateAbsencePreview(this.form)"><input name="year" type="number" min="2020" max="2100" value="${+d[0]}" oninput="updateAbsencePreview(this.form)"></div>${type==='absence'?`<label>عدد أيام الغياب</label><input name="days" type="number" min="0.5" step="0.5" value="${days}" oninput="updateAbsencePreview(this.form)"><div class="muted"><span id="absenceHint">أساس احتساب أجر اليوم: 30 يوم | الخصم التلقائي: ${fmt(auto)}</span></div><label><input id="manual" type="checkbox" style="width:auto" onchange="updateAbsencePreview(this.form)" ${o.manual?'checked':''}> تعديل قيمة الخصم يدوياً</label>`:''}${type==='safri'?`<label>اسم الوجبة / الأكل *</label><input name="meal" required maxlength="120" value="${esc(o.meal||'')}" placeholder="مثلاً: وجبة غداء">`:''}<label>${type==='paid'?'المبلغ المصروف':type==='absence'?'قيمة خصم الغياب بالدينار':'المبلغ بالدينار *'}</label><input id="amount" name="amount" type="number" min="0" required value="${o.amount??(type==='absence'?Math.round(auto):type==='paid'?Math.max(0,calc(w).remaining):'')}"><label>الملاحظات / السبب</label><textarea name="note">${esc(o.note||'')}</textarea>${type==='paid'?`<p class="muted">المتبقي قبل الصرف: ${fmt(calc(w).remaining+(id?Number(o.amount):0))}. يمكن تسجيل صرف جزئي.</p>`:''}<p><button class="primary" type="submit">${type==='paid'?'تأكيد الصرف':'حفظ العملية'}</button></p></form>`)}function updateAbsencePreview(f){if(!f||!f.elements.days)return;let y=+f.elements.year.value,m=+f.elements.month.value,days=new Date(y,m,0).getDate(),count=+f.elements.days.value,w=db.workers.find(x=>x.id===selected);if(!w||!days||!Number.isFinite(count))return;let amount=Math.round(Number(w.salary)/30*count),hint=document.getElementById('absenceHint');if(hint)hint.textContent='أساس احتساب أجر اليوم: 30 يوم | الخصم التلقائي: '+fmt(amount);if(!f.querySelector('#manual')?.checked)f.elements.amount.value=amount}
+function saveOp(e,type,id){e.preventDefault();let f=e.target,year=+f.year.value,month=+f.month.value,day=+f.day.value,date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;if(new Date(date+'T12:00:00').getDate()!==day||new Date(date+'T12:00:00').getMonth()+1!==month){alert('التاريخ غير صحيح');return}let amount=+f.amount.value;if(type==='absence'&&!f.querySelector('#manual').checked){amount=Number(db.workers.find(w=>w.id===selected)?.salary||0)/30*(+f.days.value)}if(type==='absence'&&(!(Number(f.days.value)>0)||Number(f.days.value)>new Date(year,month,0).getDate())){alert('عدد أيام الغياب غير صحيح');return}if(type==='absence'){let w=db.workers.find(x=>x.id===selected),lastDay=new Date(year,month,0).getDate(),first=date.slice(0,7)+'-01',last=date.slice(0,7)+'-'+String(lastDay).padStart(2,'0'),from=w.start&&w.start>first?w.start:first,to=w.endDate&&w.endDate<last?w.endDate:last,eligibleDays=from<=to?(Date.UTC(+to.slice(0,4),+to.slice(5,7)-1,+to.slice(8,10))-Date.UTC(+from.slice(0,4),+from.slice(5,7)-1,+from.slice(8,10)))/86400000+1:0,other=db.ops.filter(x=>x.worker===selected&&x.type==='absence'&&x.id!==id&&x.date.slice(0,7)===date.slice(0,7)).reduce((a,x)=>a+(Number(x.days)||0),0);if(date<from||date>to||other+Number(f.days.value)>eligibleDays){alert('الغياب خارج فترة خدمة العامل أو يتجاوز أيام استحقاقه بالشهر');return}}if(amount<0||!Number.isFinite(amount)){alert('المبلغ غير صحيح');return}let o=db.ops.find(x=>x.id===id);if(!o){o={id:crypto.randomUUID(),worker:selected,type};db.ops.push(o)}Object.assign(o,{date,amount,meal:type==='safri'?f.meal.value.trim():'',note:f.note.value,days:type==='absence'?+f.days.value:0,manual:type==='absence'?f.querySelector('#manual').checked:false});save();closeModal();render()}function removeOp(id){if(confirm('حذف هذه العملية؟')){db.ops=db.ops.filter(o=>o.id!==id);save();render()}}function terminateWorker(id){let w=db.workers.find(x=>x.id===id);if(!w)return;modal(`<h2>إنهاء خدمات ${esc(w.name)}</h2><form onsubmit="saveTermination(event,'${id}')"><label>تاريخ إنهاء الخدمات</label>${dateFields("endDate",w.endDate)}<label>سبب إنهاء الخدمات (اختياري)</label><textarea name="endReason">${esc(w.endReason||'')}</textarea><div class="actions"><button class="primary" type="submit">تأكيد إنهاء الخدمات</button><button type="button" onclick="closeModal()">إلغاء</button></div></form>`)}function saveTermination(e,id){e.preventDefault();let w=db.workers.find(x=>x.id===id),d=readDate(e.target,'endDate');if(!d){alert('تاريخ الإنهاء غير صحيح');return}if(w.start&&d<w.start){alert('تاريخ الإنهاء يسبق المباشرة');return}w.endDate=d;w.endReason=e.target.endReason.value;w.active=false;save();closeModal();render()}function reactivateWorker(id){let w=db.workers.find(x=>x.id===id);if(!w||!confirm('إعادة تفعيل العامل؟ سيعود إلى كشوف الرواتب الجارية.'))return;w.active=true;delete w.endDate;delete w.endReason;save();render()}function trashWorker(id){if(!confirm('نقل العامل إلى سلة المحذوفات؟'))return;let w=db.workers.find(x=>x.id===id);db.trash.push(w);db.workers=db.workers.filter(x=>x.id!==id);selected=null;save();render()}function restoreWorker(id){let w=db.trash.find(x=>x.id===id);db.workers.push(w);db.trash=db.trash.filter(x=>x.id!==id);save();render()}function statement(){let w=db.workers.find(x=>x.id===selected),c=calc(w);return `مطعم وكافيه أوتار\nكشف حساب العامل: ${w.name}\nالشهر: ${period}\nالراتب: ${fmt(c.earned)}\nالسلف: ${fmt(c.advance)}\nالسفري (أكل): ${fmt(c.safri)}\nالخصومات: ${fmt(c.deductions)}\nالغياب: ${fmt(c.absence)}\nالمكافآت: ${fmt(c.bonus)}\nالمدفوع: ${fmt(c.paid)}\nالمتبقي: ${fmt(c.remaining)}\n\nالعمليات:\n${c.ops.map(o=>`${o.date} - ${names[o.type]} - ${o.meal||''} - ${fmt(o.amount)} - ${o.note||''}`).join('\n')}`}function previewStatement(){let w=db.workers.find(x=>x.id===selected),c=calc(w),paidOps=c.ops.filter(o=>o.type==='paid'),last=paidOps.at(-1),receipt=paidOps.length>0;let lines=[['راتب مدة العمل',c.earned],['المكافآت',c.bonus],['السلف',c.advance],['السفري (أكل)',c.safri],['الخصومات',c.deductions],['الغياب',c.absence],['صافي المستحق للدورة',c.earned+c.bonus-c.advance-c.safri-c.deduct],['المصروف فعلياً',c.paid],['المتبقي للصرف',c.remaining]];let rows=lines.map(([k,v])=>`<tr><td>${k}</td><td>${fmt(v)}</td></tr>`).join('');let details=c.ops.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(o=>`<tr><td>${esc(dateDMY(o.date))}</td><td>${names[o.type]}${o.type==='safri'?' - '+esc(o.meal||'وجبة'): ''}</td><td>${fmt(o.amount)}</td></tr>`).join('');let html=`<div class="statement-sheet" id="statementSheet" dir="rtl"><div class="statement-head"><h2>AWTAR STAFF PRO</h2><div>مطعم وكافيه أوتار</div><h1>${receipt?'كشف حساب ومستحقات راتب':'كشف مستحقات راتب'}</h1></div><div class="statement-meta"><div>اسم العامل: <b>${esc(w.name)}</b></div><div>القسم: <b>${esc(w.job||'غير محدد')}</b></div><div>دورة الراتب: <b>${esc(period.slice(5,7)+"/"+period.slice(0,4))}</b></div><div>رقم الوصل: <b>${receipt?esc(last.id.slice(0,8).toUpperCase()):'—'}</b></div><div>تاريخ آخر صرف: <b>${receipt?esc(dateDMY(last.date)):'غير مسجل'}</b></div></div><table class="statement-table"><tbody>${rows}</tbody></table><div class="statement-total"><b>المستحق المتبقي للصرف: ${fmt(c.remaining)}</b></div><h3>تفاصيل العمليات</h3><table class="statement-table"><thead><tr><th>التاريخ</th><th>العملية</th><th>المبلغ</th></tr></thead><tbody>${details||'<tr><td colspan="3">لا توجد عمليات</td></tr>'}</tbody></table><p class="statement-note">${receipt?'تم تسجيل صرف في هذه الدورة. هذا كشف حساب وليس إثبات استلام موقعاً.':'كشف فقط — ليس وصل استلام. يجب تسجيل الصرف الفعلي لإصدار بيانات وصل الصرف.'}</p></div>`;modal(`<div class="between no-print"><h2>كشف حساب العامل</h2><button onclick="closeModal()">إغلاق ×</button></div>${html}<div class="actions no-print"><button class="primary" onclick="printStatement()">طباعة / حفظ PDF</button><button onclick="shareStatement()">مشاركة واتساب</button></div>`)}
+function printStatement(){
+ const sheet=document.getElementById('statementSheet');if(!sheet){alert('افتح معاينة الكشف أولاً');return}
+ const payroll=sheet.querySelectorAll('thead th').length>=8;
+ const css=`@page{size:A4 ${payroll?'landscape':'portrait'};margin:10mm}*{box-sizing:border-box}body{font-family:Tahoma,Arial,sans-serif;direction:rtl;color:#172c23;padding:8px;margin:0}.toolbar{position:sticky;top:0;background:#eaf1eb;padding:12px;display:flex;gap:10px;justify-content:center;z-index:3}.toolbar button{padding:12px 18px;border:0;border-radius:8px;background:#17382d;color:white;font-size:16px}h1,h2{text-align:center;margin:10px 0}table{width:100%;border-collapse:collapse;table-layout:auto;font-size:${payroll?'9':'12'}px}td,th{border:1px solid #aaa;padding:${payroll?'5px 3px':'7px'};text-align:right;white-space:normal;overflow-wrap:normal;word-break:normal}td{font-variant-numeric:tabular-nums}img{max-width:100%}.statement-head,.statement-total{text-align:center;margin:12px 0}.statement-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.statement-note{margin-top:18px}tr{break-inside:avoid}.statement-sheet{width:100%}@media print{.toolbar{display:none!important}body{padding:0}thead{display:table-header-group}}`;
+ const page='<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>كشف أوتار</title><style>'+css+'</style></head><body><div class="toolbar"><button onclick="window.print()">🖨 طباعة / PDF</button><button onclick="window.close();if(!window.closed)history.back()">↩ رجوع</button></div>'+sheet.outerHTML+'</body></html>';
+ const w=window.open('','_blank');if(w){w.document.open();w.document.write(page);w.document.close()}else{alert('اسمح بفتح النوافذ المنبثقة في Safari، أو استخدم خيار مشاركة الكشف.')}
+}
+async function shareStatement(){let txt=statement();if(navigator.share){try{await navigator.share({title:'كشف حساب عامل - مطعم وكافيه أوتار',text:txt});return}catch(e){if(e.name==='AbortError')return}}try{await navigator.clipboard.writeText(txt);alert('تم نسخ الكشف. افتح واتساب والصقه، أو استخدم طباعة / حفظ PDF لإرسال الملف.')}catch(e){alert('استخدم طباعة / حفظ PDF لمشاركة الكشف')}}
+function backup(){let a=document.createElement('a'),url=URL.createObjectURL(new Blob([JSON.stringify(db,null,2)],{type:'application/json'}));a.href=url;a.download='awtar-backup-'+new Date().toISOString().slice(0,10)+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),3000)}async function restore(e){
+  const input=e.target,file=input.files[0];
+  if(!file)return;
+  input.value='';
+  let data;
+  try{data=preparePayrollData(JSON.parse(await file.text()))}
+  catch(error){alert('ملف النسخة الاحتياطية غير صالح');return}
+  if(!input.isConnected||!confirm('استبدال البيانات الحالية بالنسخة الاحتياطية؟'))return;
+  if(await commitPayrollChange(data))render();
+}
+
+const docTypes=[['workerPhoto','صورة العامل الشخصية'],['nationalFront','البطاقة الموحدة - الوجه الأمامي'],['nationalBack','البطاقة الموحدة - الوجه الخلفي'],['residence','بطاقة السكن - الوجه الأمامي'],['residenceBack','بطاقة السكن - الوجه الخلفي']];
+function openDocuments(id){
+  const worker=db.workers.find(w=>w.id===id);
+  if(!worker)return;
+  const fields=docTypes.map(([key,label])=>{
+    const photo=worker.documents?.[key];
+    const handler=`saveDocument(event,'${id}','${key}')`;
+    return `<div class="item"><strong>${label}</strong>
+      <div class="actions" style="margin:10px 0">
+        <button type="button" onclick="document.getElementById('gallery-${key}').click()">اختيار من الاستوديو</button>
+        <input hidden id="gallery-${key}" type="file" accept="image/*" onchange="${handler}">
+        <button type="button" onclick="document.getElementById('camera-${key}').click()">فتح الكاميرا</button>
+        <input hidden id="camera-${key}" type="file" accept="image/*" capture="${key==='workerPhoto'?'user':'environment'}" onchange="${handler}">
+      </div>
+      ${photo?`<img src="${esc(photo)}" style="max-width:100%;max-height:200px;object-fit:contain;border-radius:8px">
+        <div><button onclick="deleteDocument('${id}','${key}')">حذف الصورة</button></div>`:'<div class="muted">لم تُرفع صورة بعد</div>'}
+    </div>`;
+  }).join('');
+  modal(`<div class="between"><h2>مستمسكات ${esc(worker.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div>
+    <p class="muted">تقدر تقصّ الصورة قبل الحفظ. الصور محفوظة على هذا الجهاز وتدخل ضمن النسخة الاحتياطية.</p>
+    ${fields}<button class="primary" onclick="printDocuments('${id}')">معاينة وطباعة المستمسكات بورقة واحدة</button>`);
+}
+function saveDocument(e,id,k){
+  const input=e.target,file=input.files?.[0];
+  if(!file)return;
+  input.value='';
+  if(file.type&&!file.type.startsWith('image/')){alert('اختر صورة');return}
+  const url=URL.createObjectURL(file),im=new Image();
+  im.onerror=()=>{
+    URL.revokeObjectURL(url);
+    if(input.isConnected)alert('تعذّر فتح الصورة. جرّب صورة ثانية.');
+  };
+  im.onload=()=>{
+    URL.revokeObjectURL(url);
+    if(input.isConnected)openDocumentCrop(im,id,k);
+  };
+  im.src=url;
+}
+function openDocumentCrop(im,id,k){
+  const edges=[['left','يسار'],['right','يمين'],['top','أعلى'],['bottom','أسفل']];
+  modal(`<div class="between"><h2>قصّ الصورة</h2><button id="cropCancel">إلغاء</button></div>
+    <p class="muted">حرّك الأشرطة حتى تبقى الصورة المطلوبة داخل الإطار، وبعدها اضغط حفظ الصورة.</p>
+    <div id="cropPreview" dir="ltr" style="position:relative;overflow:hidden;margin:0 auto;width:fit-content;max-width:100%">
+      <div id="cropFrame" style="position:absolute;inset:0;border:2px solid #fff;box-shadow:0 0 0 100vmax #0009;pointer-events:none"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0">
+      ${edges.map(([edge,label])=>`<label>${label}<input id="crop-${edge}" style="width:100%" dir="ltr" type="range" min="0" max="90" value="0"></label>`).join('')}
+    </div>
+    <button id="cropSave" class="primary">حفظ الصورة</button> <button id="cropReset">إعادة ضبط القصّ</button>`);
+  const preview=document.getElementById('cropPreview'),frame=document.getElementById('cropFrame');
+  im.alt='معاينة الصورة قبل الحفظ';
+  im.style.cssText='display:block;max-width:100%;max-height:36vh;width:auto;height:auto';
+  preview.prepend(im);
+  const controls=Object.fromEntries(edges.map(([edge])=>[edge,document.getElementById('crop-'+edge)]));
+  const opposite={left:'right',right:'left',top:'bottom',bottom:'top'};
+  function updateFrame(){
+    for(const [edge] of edges)frame.style[edge]=controls[edge].value+'%';
+  }
+  for(const [edge] of edges){
+    controls[edge].oninput=()=>{
+      controls[edge].value=Math.min(+controls[edge].value,90-Number(controls[opposite[edge]].value));
+      updateFrame();
+    };
+  }
+  document.getElementById('cropReset').onclick=()=>{
+    for(const [edge] of edges)controls[edge].value=0;
+    updateFrame();
+  };
+  document.getElementById('cropCancel').onclick=()=>openDocuments(id);
+  document.getElementById('cropSave').onclick=async()=>{
+    const left=Number(controls.left.value),right=Number(controls.right.value);
+    const top=Number(controls.top.value),bottom=Number(controls.bottom.value);
+    const width=im.naturalWidth*(100-left-right)/100,height=im.naturalHeight*(100-top-bottom)/100;
+    const maxEdge=k==='workerPhoto'?640:1300;
+    const scale=Math.min(1,maxEdge/Math.max(width,height)),canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(width*scale));
+    canvas.height=Math.max(1,Math.round(height*scale));
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(im,im.naturalWidth*left/100,im.naturalHeight*top/100,width,height,0,0,canvas.width,canvas.height);
+    if(await changeDocument(id,k,canvas.toDataURL('image/jpeg',.72))){
+      render();
+      openDocuments(id);
+    }
+  };
+}
+async function deleteDocument(id,k){
+  if(!confirm('حذف صورة المستمسك؟'))return;
+  if(await changeDocument(id,k,null)){
+    render();
+    openDocuments(id);
+  }
+}
+function printDocuments(id){let w=db.workers.find(x=>x.id===id);let blocks=docTypes.map(([k,label])=>`<div style="margin:12px 0;text-align:center;break-inside:avoid"><strong>${label}</strong><div>${w.documents?.[k]?`<img src="${w.documents[k]}" style="display:block;margin:8px auto;max-width:100%;max-height:220px;object-fit:contain">`:'لم يتم رفع المستمسك'}</div></div>`).join('');modal(`<div class="between no-print"><h2>معاينة المستمسكات</h2><button onclick="closeModal()">إغلاق ×</button></div><div class="statement-sheet" id="statementSheet" dir="rtl"><div class="statement-head"><h2>مطعم وكافيه أوتار</h2><h1>مستمسكات العامل</h1></div><p>اسم العامل: <b>${esc(w.name)}</b></p>${blocks}</div><button class="primary no-print" onclick="printStatement()">طباعة / حفظ PDF</button>`)}
+function editSchedule(id){let w=db.workers.find(x=>x.id===id);if(!w)return;modal(`<div class="between"><h2>أوقات دوام ${esc(w.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div><form onsubmit="saveSchedule(event,'${id}')"><label>بداية الدوام (12 ساعة)</label>${time12Fields('shiftStart',w.shiftStart||'09:00')}<label>نهاية الدوام (12 ساعة)</label>${time12Fields('shiftEnd',w.shiftEnd||'17:00')}<label>أيام الدوام</label><input name="workDays" placeholder="مثلاً: السبت إلى الخميس" value="${esc(w.workDays||'')}"><label>الاستراحة والملاحظات</label><textarea name="shiftNote">${esc(w.shiftNote||'')}</textarea><p><button type="submit" class="primary">حفظ أوقات الدوام</button></p></form>`)}
+function saveSchedule(e,id){e.preventDefault();let w=db.workers.find(x=>x.id===id),f=e.target;w.shiftStart=time24(f,'shiftStart');w.shiftEnd=time24(f,'shiftEnd');for(let k of ['workDays','shiftNote'])w[k]=f.elements[k].value;save();closeModal();render()}
+function showContract(id){let w=db.workers.find(x=>x.id===id);if(!w)return;modal(`<div class="between no-print"><h2>عقد العمل</h2><button onclick="closeModal()">إغلاق ×</button></div><div class="statement-sheet" id="statementSheet" dir="rtl"><div class="statement-head"><h2>مطعم وكافيه أوتار</h2><h1>نموذج عقد عمل</h1></div><p>تم الاتفاق بين إدارة مطعم وكافيه أوتار والعامل <b>${esc(w.name)}</b> على العمل بوظيفة <b>${esc(w.job||'غير محدد')}</b> اعتباراً من <b>${esc(dateDMY(w.start))}</b>.</p><table class="statement-table"><tr><td>الراتب الأساسي</td><td>${fmt(w.salary)}</td></tr><tr><td>بداية الدوام</td><td>${format12(w.shiftStart)}</td></tr><tr><td>نهاية الدوام</td><td>${format12(w.shiftEnd)}</td></tr><tr><td>أيام العمل</td><td>${esc(w.workDays||'غير محدد')}</td></tr><tr><td>ملاحظات الدوام</td><td>${esc(w.shiftNote||'لا توجد')}</td></tr></table><p>تخضع شروط العمل والإجازات والحقوق والالتزامات للقانون العراقي والاتفاق المكتوب بين الطرفين. هذا نموذج أولي يستلزم استكمال البنود ومراجعته قبل التوقيع.</p><div style="display:flex;justify-content:space-between;margin-top:55px"><span>توقيع العامل: __________</span><span>توقيع الإدارة: __________</span></div></div><div class="no-print"><button class="primary" onclick="printStatement()">طباعة / حفظ PDF</button></div>`)}
+
+async function saveBusiness(){db.config.business=$('businessName').value.trim()||'مطعم وكافيه أوتار';if(await save()){render();alert('تم الحفظ')}}
+function addDepartment(){let x=prompt('اسم القسم الجديد');if(!x?.trim())return;db.config.departments.push(x.trim());save();render()}
+function renameDepartment(i){let old=db.config.departments[i],x=prompt('تعديل اسم القسم',old);if(!x?.trim())return;db.config.departments[i]=x.trim();db.workers.forEach(w=>{if(w.department===old)w.department=x.trim()});save();render()}
+function removeDepartment(i){if(!confirm('حذف القسم من القائمة؟ لن تُحذف بيانات العمال'))return;db.config.departments.splice(i,1);save();render()}
+function addField(){let label=prompt('اسم الحقل الجديد (مثلاً: رقم البطاقة أو عنوان السكن)');if(!label?.trim())return;let type=prompt('نوع الحقل: text أو number أو date','text');if(!['text','number','date'].includes(type))type='text';db.config.fields.push({id:'f'+Date.now(),label:label.trim(),type});save();render()}
+function renameField(i){let f=db.config.fields[i],x=prompt('اسم الحقل',f.label);if(!x?.trim())return;f.label=x.trim();save();render()}
+function removeField(i){if(!confirm('حذف الحقل من العرض؟ ستبقى قيمه في النسخ الاحتياطية القديمة فقط'))return;let f=db.config.fields.splice(i,1)[0];db.workers.forEach(w=>{if(w.custom)delete w.custom[f.id]});save();render()}
+
+
+function aiView(){return `<section class="panel"><h2>✦ مساعد ChatGPT لأوتار</h2><p class="muted">اسأل عن إدارة العمال والرواتب أو اطلب صياغة عقد أو كشف. هذا الزر يفتح ChatGPT في صفحة منفصلة، ولا يرسل بيانات العمال تلقائياً.</p><label>شنو تريد تسأل؟</label><textarea id="aiQuestion" rows="5" placeholder="مثلاً: اكتبلي نموذج إنذار تأخير لعامل في مطعم وكافيه أوتار"></textarea><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button onclick="askChatGPT()">نسخ السؤال وفتح ChatGPT ↗</button><button class="secondary" onclick="window.open('https://chatgpt.com/','_blank','noopener')">فتح ChatGPT</button></div><p class="muted" id="aiNotice">بعد الفتح الصق السؤال في المحادثة. لا تشارك أرقام المستمسكات أو معلومات العمال الحساسة.</p></section>`}
+async function askChatGPT(){let q=document.getElementById('aiQuestion').value.trim();if(!q){alert('اكتب سؤالك أولاً');return}let msg='أنا أدير مطعم وكافيه أوتار. '+q;try{await navigator.clipboard.writeText(msg);document.getElementById('aiNotice').textContent='تم نسخ السؤال. الصقه في ChatGPT.'}catch(e){prompt('انسخ هذا السؤال ثم افتح ChatGPT:',msg)}window.open('https://chatgpt.com/','_blank','noopener')}
+
+const AUTH_KEY='awtar_staff_auth_v1';let unlocked=false,authRecord=null;try{authRecord=JSON.parse(localStorage.getItem(AUTH_KEY))}catch(e){};
+const originalRender=render;
+render=function(){if(!unlocked){showLogin();return}originalRender();$('tabs').insertAdjacentHTML('beforeend',`<button onclick="go('messages')" class="${tab==='messages'?'active':''}">رسائل الكادر</button><button onclick="lockApp()">🔒 تسجيل الخروج</button>`);if(tab==='messages')$('main').innerHTML=messagesView();if(tab==='settings')$('main').insertAdjacentHTML('afterbegin','<section class="panel"><h2>كلمة المرور</h2><button onclick="changePassword()">تغيير كلمة المرور</button></section>')};
+function showLogin(){document.body.classList.remove('app-open');$('summary').innerHTML='';$('tabs').innerHTML='';$('main').innerHTML='';$('modalroot').innerHTML='';let root=document.getElementById('loginroot');if(!root){root=document.createElement('div');root.id='loginroot';document.body.append(root)}root.innerHTML=`<section class="panel" style="max-width:420px;margin:8vh auto"><h2>🔒 برنامج رواتب أوتار</h2><p>${authRecord?'أدخل كلمة المرور للدخول':'أول تشغيل: اختر كلمة مرور للبرنامج'}</p><form onsubmit="submitLogin(event)"><label>كلمة المرور</label><input type="password" name="password" required ${authRecord?'':'minlength="6"'} autocomplete="${authRecord?'current-password':'new-password'}">${authRecord?'':'<label>تأكيد كلمة المرور</label><input type="password" name="confirm" required autocomplete="new-password">'}<p id="loginError" role="alert"></p><button class="primary">${authRecord?'دخول':'حفظ كلمة المرور والدخول'}</button></form><p class="muted">قفل محلي لهذا المتصفح، وليس تشفيراً للبيانات. احتفظ بكلمة المرور وبنسخة احتياطية.</p></section>`}
+async function passwordHash(password,salt){let key=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);let bits=await crypto.subtle.deriveBits({name:'PBKDF2',salt:new Uint8Array(salt),iterations:210000,hash:'SHA-256'},key,256);return Array.from(new Uint8Array(bits),x=>x.toString(16).padStart(2,'0')).join('')}
+async function makePassword(password){let salt=Array.from(crypto.getRandomValues(new Uint8Array(16)));return {salt,hash:await passwordHash(password,salt)}}
+async function submitLogin(e){e.preventDefault();let f=e.target,b=f.querySelector('button');b.disabled=true;try{let p=f.elements.password.value;if(!authRecord){if(p.length<6||p!==f.elements.confirm.value)throw Error('اكتب 6 أحرف أو أرقام على الأقل وتأكد من تطابق الكلمتين');let record=await makePassword(p);localStorage.setItem(AUTH_KEY,JSON.stringify(record));authRecord=record}else if(await passwordHash(p,authRecord.salt)!==authRecord.hash)throw Error('كلمة المرور غير صحيحة');unlocked=true;$('loginroot').remove();document.body.classList.add('app-open');render()}catch(err){$('loginError').textContent=crypto.subtle?err.message:'افتح البرنامج عبر HTTPS حتى يعمل قفل كلمة المرور';b.disabled=false}}
+function lockApp(){unlocked=false;selected=null;showLogin()}
+function changePassword(){modal(`<h2>تغيير كلمة المرور</h2><form onsubmit="savePasswordChange(event)"><label>كلمة المرور الحالية</label><input name="current" type="password" required autocomplete="current-password"><label>كلمة المرور الجديدة</label><input name="next" type="password" minlength="6" required autocomplete="new-password"><label>تأكيد الجديدة</label><input name="confirm" type="password" required autocomplete="new-password"><p id="passwordError" role="alert"></p><button class="primary">حفظ</button> <button type="button" onclick="closeModal()">إلغاء</button></form>`)}
+async function savePasswordChange(e){e.preventDefault();let f=e.target;try{if(await passwordHash(f.current.value,authRecord.salt)!==authRecord.hash)throw Error('كلمة المرور الحالية غير صحيحة');if(f.next.value.length<6||f.next.value!==f.confirm.value)throw Error('الجديدة لا تقل عن 6 أحرف أو أرقام ويجب تطابق التأكيد');let record=await makePassword(f.next.value);localStorage.setItem(AUTH_KEY,JSON.stringify(record));authRecord=record;closeModal();alert('تم تغيير كلمة المرور')}catch(err){$('passwordError').textContent=err.message}}
+function normalizePhone(value){let s=String(value||'').replace(/[٠-٩]/g,c=>String(c.charCodeAt(0)-1632)).replace(/[۰-۹]/g,c=>String(c.charCodeAt(0)-1776)).replace(/[\s()+.\-]/g,'');if(s.startsWith('00'))s=s.slice(2);if(/^07\d{9}$/.test(s))s='964'+s.slice(1);if(/^7\d{9}$/.test(s))s='964'+s;return /^[1-9]\d{7,14}$/.test(s)?s:''}
+let messageDraft='',messageQueue=[],openedPhones=new Set();
+function whatsappMessagesView(){return `<section class="panel"><h2>توجيه للكادر عبر واتساب</h2><p>اكتب رسالة واحدة لجميع أرقام الموظفين المسجلة. جهّز القائمة ثم افتح واتساب لكل رقم واضغط إرسال داخله.</p><label>نص التوجيه</label><textarea id="staffMessage" rows="5" oninput="messageDraft=this.value">${esc(messageDraft)}</textarea><label><input id="includeFormer" type="checkbox" checked style="width:auto"> تضمين الموظفين المنتهية خدماتهم أيضاً</label><p class="muted">الرقم العراقي: 07xxxxxxxxx أو +9647xxxxxxxxx. للأرقام الدولية أضف رمز البلد.</p><button class="primary" onclick="prepareMessages()">تجهيز الرسالة لجميع الأرقام</button><div id="messageRecipients"></div><p class="muted">فتح المحادثة لا يعني إرسال الرسالة أو تسليمها. الإرسال التلقائي للجميع يحتاج ربطاً رسمياً بخدمة واتساب للأعمال.</p></section>`}
+function prepareMessages(){messageDraft=$('staffMessage').value.trim();if(!messageDraft){alert('اكتب الرسالة أولاً');return}let seen=new Set(),invalid=[],duplicates=0;messageQueue=[];openedPhones.clear();db.workers.filter(w=>$('includeFormer').checked||w.active!==false).forEach(w=>{let phone=normalizePhone(w.phone);if(!phone){invalid.push(w.name);return}if(seen.has(phone)){duplicates++;return}seen.add(phone);messageQueue.push({name:w.name,phone,text:messageDraft})});$('messageRecipients').innerHTML=`<h3>معاينة الرسالة</h3><p style="white-space:pre-wrap">${esc(messageDraft)}</p><p>${messageQueue.length} رقم صالح · ${duplicates} رقم مكرر تم تجاوزه</p>${invalid.length?`<p role="alert">رقم ناقص أو غير صالح: ${invalid.map(esc).join('، ')}</p>`:''}${messageQueue.map((w,i)=>`<div class="item between"><span>${esc(w.name)}<br><bdi>+${w.phone}</bdi></span><button id="wa_${i}" onclick="openStaffMessage(${i})">فتح واتساب</button></div>`).join('')||'<p>لا توجد أرقام صالحة.</p>'}`}
+function openStaffMessage(i){let w=messageQueue[i];if(!w)return;window.open('https://wa.me/'+w.phone+'?text='+encodeURIComponent(w.text),'_blank','noopener');openedPhones.add(w.phone);$('wa_'+i).textContent='فُتحت المحادثة — فتح مجدداً'}
+let smsBusy=false,smsBatchId='',smsResult=null,smsLastPayload='';
+function smsRecipients(){let seen=new Set(),valid=[],invalid=[],duplicates=0;db.workers.filter(w=>$('smsFormer').checked||w.active!==false).forEach(w=>{let p=normalizePhone(w.phone);if(!p){invalid.push(w.name);return}if(seen.has(p)){duplicates++;return}seen.add(p);valid.push({name:w.name,phone:'+'+p})});return {valid,invalid,duplicates}}
+function messagesView(){return `<section class="panel"><h2>إرسال SMS للجميع</h2><p>اكتب رسالة واحدة لتصل لكل رقم محفوظ بشكل منفصل، بدون فتح تطبيق آخر.</p><p class="muted">يتطلب تفعيل خدمة SMS على الخادم. تُحسب الكلفة حسب الأرقام وأجزاء الرسالة، وقد تُحسب الرسالة العربية الطويلة عدة رسائل.</p><label>نص الرسالة</label><textarea id="smsText" rows="5" maxlength="1600" oninput="messageDraft=this.value">${esc(messageDraft)}</textarea><label><input type="checkbox" id="smsFormer" checked style="width:auto"> تضمين المنتهية خدماتهم</label><label>رمز إرسال SMS</label><input type="password" id="smsAccess" autocomplete="off" placeholder="رمز خاص يضبط عند تفعيل الخدمة"><p class="muted">هذا الرمز منفصل عن كلمة مرور البرنامج ولا يُحفظ في النسخ الاحتياطية.</p><button class="primary" id="smsSend" onclick="sendAllSms()" ${smsBusy?'disabled':''}>${smsBusy?'جارٍ الإرسال…':'إرسال للجميع'}</button><div id="smsResults" role="status" aria-live="polite"></div></section><details class="panel"><summary>واتساب اليدوي</summary>${whatsappMessagesView()}</details>`}
+function drawSmsResults(){if(!$('smsResults')||!smsResult)return;$('smsResults').innerHTML='<h3>نتيجة طلب الإرسال</h3>'+smsResult.map(r=>`<div class="item"><bdi>${esc(r.phone)}</bdi> — ${esc(r.state==='accepted'?'قبلت الخدمة الطلب — ليس تأكيد تسليم':r.state==='unknown'?'النتيجة غير مؤكدة؛ راجع لوحة الخدمة قبل إعادة الإرسال':'رفضت الخدمة الطلب')}${r.code?' ('+esc(r.code)+')':''}</div>`).join('')}
+async function sendAllSms(){if(smsBusy)return;let text=$('smsText').value.trim(),token=$('smsAccess').value.trim(),r=smsRecipients();if(!text||!token){alert('اكتب الرسالة ورمز الإرسال');return}if(!r.valid.length){alert('لا توجد أرقام صالحة');return}if(r.valid.length>500){alert('الحد الأقصى 500 رقم في الدفعة');return}if(location.protocol==='file:'){alert('الإرسال يحتاج تشغيل النسخة على استضافة تدعم الخادم؛ فتح HTML وحده لا يكفي');return}let preview=`إرسال مدفوع إلى ${r.valid.length} رقم؟\nالمكرر المستبعد: ${r.duplicates}\nالأرقام الناقصة أو غير الصالحة: ${r.invalid.length}${r.invalid.length?'\n'+r.invalid.join('، '):''}\n\n${text}`;if(!confirm(preview))return;let payload=JSON.stringify({text,phones:r.valid.map(x=>x.phone)});if(payload!==smsLastPayload){smsBatchId=crypto.randomUUID();smsLastPayload=payload}smsBusy=true;$('smsSend').disabled=true;$('smsResults').textContent='جارٍ إرسال الطلب… لا تغلق الصفحة.';try{let res=await fetch('/api/sms',{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+token},body:JSON.stringify({...JSON.parse(payload),id:smsBatchId})});let data=await res.json();if(!res.ok)throw Error(data.error||'تعذر الإرسال');smsResult=data.results;drawSmsResults();if(smsResult.every(x=>x.state==='failed')){smsLastPayload=''}else{$('smsResults').insertAdjacentHTML('beforeend','<p>نفس الرسالة ونفس القائمة تستخدم رقم الدفعة ذاته لتجنب التكرار. لإرسال جديد مقصود اضغط الزر أدناه.</p><button onclick="if(confirm(\'إنشاء دفعة جديدة قد يكرر الرسالة ويضيف كلفة. متأكد؟\')){smsLastPayload=\'\';this.disabled=true}">السماح بدفعة جديدة</button>')}}catch(e){$('smsResults').textContent='تعذر تأكيد النتيجة: '+e.message+' . أعد المحاولة بنفس النص والقائمة لاسترجاع نفس الدفعة؛ لا تغيّر النص قبل مراجعة الخدمة.'}finally{smsBusy=false;if($('smsSend'))$('smsSend').disabled=false}}
+
+startPayroll();
+
+</script></body></html>
+
