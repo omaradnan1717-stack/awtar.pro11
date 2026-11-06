@@ -55,7 +55,78 @@ function backup(){let a=document.createElement('a'),url=URL.createObjectURL(new 
 
 const docTypes=[['workerPhoto','صورة العامل الشخصية'],['nationalFront','البطاقة الموحدة - الوجه الأمامي'],['nationalBack','البطاقة الموحدة - الوجه الخلفي'],['residence','بطاقة السكن - الوجه الأمامي'],['residenceBack','بطاقة السكن - الوجه الخلفي']];
 function openDocuments(id){let w=db.workers.find(x=>x.id===id);if(!w)return;w.documents ||= {};let fields=docTypes.map(([k,label])=>`<div class="item"><strong>${label}</strong><div style="margin:10px 0"><input type="file" accept="image/*" capture="environment" onchange="saveDocument(event,'${id}','${k}')"></div>${w.documents[k]?`<img src="${w.documents[k]}" style="max-width:100%;max-height:200px;object-fit:contain;border-radius:8px"><div><button onclick="deleteDocument('${id}','${k}')">حذف الصورة</button></div>`:'<div class="muted">لم تُرفع صورة بعد</div>'}</div>`).join('');modal(`<div class="between"><h2>مستمسكات ${esc(w.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div><p class="muted">يمكن تصوير العامل مباشرة بكاميرا الآيفون أو اختيار صورته من الألبوم، وكذلك المستمسكات. الصور محفوظة محلياً على هذا الجهاز وتدخل ضمن النسخة الاحتياطية.</p>${fields}<button class="primary" onclick="printDocuments('${id}')">معاينة وطباعة المستمسكات بورقة واحدة</button>`)}
-function saveDocument(e,id,k){let file=e.target.files?.[0];if(!file)return;if(!file.type.startsWith('image/')){alert('اختر صورة');return}let reader=new FileReader();reader.onload=()=>{let im=new Image();im.onload=()=>{let max=1300,scale=Math.min(1,max/Math.max(im.width,im.height)),c=document.createElement('canvas');c.width=Math.round(im.width*scale);c.height=Math.round(im.height*scale);c.getContext('2d').drawImage(im,0,0,c.width,c.height);let w=db.workers.find(x=>x.id===id);w.documents ||= {};let old=w.documents[k];w.documents[k]=c.toDataURL('image/jpeg',.72);try{localStorage.setItem(KEY,JSON.stringify(db));openDocuments(id)}catch(err){if(old)w.documents[k]=old;else delete w.documents[k];alert('مساحة حفظ Safari غير كافية. احفظ نسخة احتياطية واحذف الصور غير اللازمة.')}};im.src=reader.result};reader.readAsDataURL(file)}
+function saveDocument(e,id,k){
+  const input=e.target,file=input.files?.[0];
+  if(!file)return;
+  input.value='';
+  if(file.type&&!file.type.startsWith('image/')){alert('اختر صورة');return}
+  const url=URL.createObjectURL(file),im=new Image();
+  im.onerror=()=>{
+    URL.revokeObjectURL(url);
+    if(input.isConnected)alert('تعذّر فتح الصورة. جرّب صورة ثانية.');
+  };
+  im.onload=()=>{
+    URL.revokeObjectURL(url);
+    if(input.isConnected)openDocumentCrop(im,id,k);
+  };
+  im.src=url;
+}
+function openDocumentCrop(im,id,k){
+  const edges=[['left','يسار'],['right','يمين'],['top','أعلى'],['bottom','أسفل']];
+  modal(`<div class="between"><h2>قصّ الصورة</h2><button id="cropCancel">إلغاء</button></div>
+    <p class="muted">حرّك الأشرطة حتى يبقى المستمسك داخل الإطار، وبعدها اضغط حفظ الصورة.</p>
+    <div id="cropPreview" dir="ltr" style="position:relative;overflow:hidden;margin:0 auto;width:fit-content;max-width:100%">
+      <div id="cropFrame" style="position:absolute;inset:0;border:2px solid #fff;box-shadow:0 0 0 100vmax #0009;pointer-events:none"></div>
+    </div>
+    <div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:12px 0">
+      ${edges.map(([edge,label])=>`<label>${label}<input id="crop-${edge}" style="width:100%" dir="ltr" type="range" min="0" max="90" value="0"></label>`).join('')}
+    </div>
+    <button id="cropSave" class="primary">حفظ الصورة</button> <button id="cropReset">إعادة ضبط القصّ</button>`);
+  const preview=document.getElementById('cropPreview'),frame=document.getElementById('cropFrame');
+  im.alt='معاينة الصورة قبل الحفظ';
+  im.style.cssText='display:block;max-width:100%;max-height:36vh;width:auto;height:auto';
+  preview.prepend(im);
+  const controls=Object.fromEntries(edges.map(([edge])=>[edge,document.getElementById('crop-'+edge)]));
+  const opposite={left:'right',right:'left',top:'bottom',bottom:'top'};
+  function updateFrame(){
+    for(const [edge] of edges)frame.style[edge]=controls[edge].value+'%';
+  }
+  for(const [edge] of edges){
+    controls[edge].oninput=()=>{
+      controls[edge].value=Math.min(+controls[edge].value,90-Number(controls[opposite[edge]].value));
+      updateFrame();
+    };
+  }
+  document.getElementById('cropReset').onclick=()=>{
+    for(const [edge] of edges)controls[edge].value=0;
+    updateFrame();
+  };
+  document.getElementById('cropCancel').onclick=()=>openDocuments(id);
+  document.getElementById('cropSave').onclick=()=>{
+    const left=Number(controls.left.value),right=Number(controls.right.value);
+    const top=Number(controls.top.value),bottom=Number(controls.bottom.value);
+    const width=im.naturalWidth*(100-left-right)/100,height=im.naturalHeight*(100-top-bottom)/100;
+    const scale=Math.min(1,1300/Math.max(width,height)),canvas=document.createElement('canvas');
+    canvas.width=Math.max(1,Math.round(width*scale));
+    canvas.height=Math.max(1,Math.round(height*scale));
+    const ctx=canvas.getContext('2d');
+    ctx.fillStyle='#fff';
+    ctx.fillRect(0,0,canvas.width,canvas.height);
+    ctx.drawImage(im,im.naturalWidth*left/100,im.naturalHeight*top/100,width,height,0,0,canvas.width,canvas.height);
+    const w=db.workers.find(x=>x.id===id);
+    if(!w)return;
+    w.documents ||= {};
+    const old=w.documents[k];
+    w.documents[k]=canvas.toDataURL('image/jpeg',.72);
+    try{localStorage.setItem(KEY,JSON.stringify(db))}
+    catch(err){
+      if(old)w.documents[k]=old;else delete w.documents[k];
+      alert('تعذّر حفظ الصورة. جرّب قصّ مساحة أكبر حول البطاقة، أو احفظ نسخة احتياطية واحذف الصور غير اللازمة.');
+      return;
+    }
+    openDocuments(id);
+  };
+}
 function deleteDocument(id,k){if(!confirm('حذف صورة المستمسك؟'))return;let w=db.workers.find(x=>x.id===id);delete w.documents[k];save();openDocuments(id)}
 function printDocuments(id){let w=db.workers.find(x=>x.id===id);let blocks=docTypes.map(([k,label])=>`<div style="margin:12px 0;text-align:center;break-inside:avoid"><strong>${label}</strong><div>${w.documents?.[k]?`<img src="${w.documents[k]}" style="display:block;margin:8px auto;max-width:100%;max-height:220px;object-fit:contain">`:'لم يتم رفع المستمسك'}</div></div>`).join('');modal(`<div class="between no-print"><h2>معاينة المستمسكات</h2><button onclick="closeModal()">إغلاق ×</button></div><div class="statement-sheet" id="statementSheet" dir="rtl"><div class="statement-head"><h2>مطعم وكافيه أوتار</h2><h1>مستمسكات العامل</h1></div><p>اسم العامل: <b>${esc(w.name)}</b></p>${blocks}</div><button class="primary no-print" onclick="printStatement()">طباعة / حفظ PDF</button>`)}
 function editSchedule(id){let w=db.workers.find(x=>x.id===id);if(!w)return;modal(`<div class="between"><h2>أوقات دوام ${esc(w.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div><form onsubmit="saveSchedule(event,'${id}')"><label>بداية الدوام (12 ساعة)</label>${time12Fields('shiftStart',w.shiftStart||'09:00')}<label>نهاية الدوام (12 ساعة)</label>${time12Fields('shiftEnd',w.shiftEnd||'17:00')}<label>أيام الدوام</label><input name="workDays" placeholder="مثلاً: السبت إلى الخميس" value="${esc(w.workDays||'')}"><label>الاستراحة والملاحظات</label><textarea name="shiftNote">${esc(w.shiftNote||'')}</textarea><p><button type="submit" class="primary">حفظ أوقات الدوام</button></p></form>`)}
