@@ -3,6 +3,8 @@
 </style><style>.statement-sheet{color:#18372b;background:white;padding:8px 0;font-size:14px}.statement-head{text-align:center;border-bottom:3px solid #17382d;padding-bottom:15px;margin-bottom:15px}.statement-head h2{font-size:22px;margin:0 0 8px}.statement-head h1{font-size:24px;margin:14px 0 0}.statement-meta{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.statement-table{border-collapse:collapse;width:100%;font-size:14px}.statement-table td,.statement-table th{border:1px solid #cddbd1;padding:11px 8px;text-align:right}.statement-table td:last-child{white-space:nowrap}.statement-total{background:#edf3ee;border:1px solid #c9dccc;border-radius:10px;text-align:center;padding:17px;margin:18px 0;font-size:18px}.statement-note{background:#fff7e6;padding:13px;border-radius:9px;line-height:1.8}@media print{body.printing-statement header,body.printing-statement nav,body.printing-statement main{display:none!important}body.printing-statement .overlay{display:block!important;position:static!important;background:white!important;padding:0!important}body.printing-statement .modal{display:block!important;max-height:none!important;max-width:none!important;width:100%!important;overflow:visible!important;padding:0!important}body.printing-statement .no-print{display:none!important}body.printing-statement .statement-sheet{display:block!important}body.printing-statement{background:white!important}}</style>
 <link rel="apple-touch-icon" href="./EAA22950-3580-4F02-B8F1-5DC375E0C210.png">
 <link rel="icon" type="image/png" href="./EAA22950-3580-4F02-B8F1-5DC375E0C210.png">
+<style>.worker-list-actions{display:flex;align-items:center;gap:8px;margin-inline-start:auto}
+.worker-list-photo{display:block;width:40px;height:40px;flex:none;border:1px solid #d6e3d9;border-radius:50%;object-fit:cover}</style>
 </head><body><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
 const KEY='awtar_staff_pro_v4';
 let db, storage, revision, pendingSave=Promise.resolve();
@@ -163,7 +165,10 @@ function workerList(former){
   }
   return workers.map(w=>`<div class="item between"><div><strong>${esc(w.name)}</strong>
     <div class="muted">${former?'تاريخ الإنهاء: '+esc(dateDMY(w.endDate)):esc(w.job||'عامل')+' · راتب شهري '+fmt(w.salary)}</div>
-    </div><button onclick="selected='${w.id}';render();scrollTo(0,0)">${former?'فتح الملف':'فتح الحساب ←'}</button></div>`).join('');
+    </div><div class="worker-list-actions">
+      ${w.documents?.workerPhoto?`<img class="worker-list-photo" src="${esc(w.documents.workerPhoto)}" width="40" height="40" loading="lazy" alt="">`:''}
+      <button onclick="selected='${w.id}';render();scrollTo(0,0)">${former?'فتح الملف':'فتح الحساب ←'}</button>
+    </div></div>`).join('');
 }
 function filterWorkers(){
   workerSearch[tab]=$('search').value;
