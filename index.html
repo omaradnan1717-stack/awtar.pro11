@@ -221,7 +221,7 @@ async function saveWorker(e,id){
   render();
 }
 function todayISO(){const d=new Date();return [d.getFullYear(),d.getMonth()+1,d.getDate()].map(n=>String(n).padStart(2,'0')).join('-')}
-const orderRates=Array.from({length:9},(_,i)=>1000+i*500);
+const orderRates=Array.from({length:10},(_,i)=>500+i*500);
 function orderFields(operation){
   const entries=operation.orderBreakdown||(operation.rate?[{rate:operation.rate,count:operation.days}]:[]);
   const rates=[...new Set([...orderRates,...entries.map(entry=>Number(entry.rate))])].sort((a,b)=>a-b);
@@ -451,4 +451,5 @@ async function sendAllSms(){if(smsBusy)return;let text=$('smsText').value.trim()
 startPayroll();
 
 </script></body></html>
+
 
