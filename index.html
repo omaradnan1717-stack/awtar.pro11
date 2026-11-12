@@ -5,7 +5,20 @@
 <link rel="icon" type="image/png" href="./EAA22950-3580-4F02-B8F1-5DC375E0C210.png">
 <style>.worker-list-actions{display:flex;align-items:center;gap:8px;margin-inline-start:auto}
 .worker-list-photo{display:block;width:40px;height:40px;flex:none;border:1px solid #d6e3d9;border-radius:50%;object-fit:cover}</style>
-</head><body><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
+<style id="awtar-welcome-style">
+#awtar-welcome{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 20% 15%,#426c54,#17382d 65%);color:#fff;text-align:center;transition:opacity .4s,visibility .4s}
+#awtar-welcome.leaving{opacity:0;visibility:hidden;pointer-events:none}
+#awtar-welcome .welcome-card{width:min(390px,100%);animation:awtarWelcomeIn .7s ease both}
+#awtar-welcome .welcome-mark{width:88px;height:88px;border:1px solid #e7cba366;border-radius:26px;display:grid;place-items:center;margin:0 auto 24px;color:#e7cba3;font-size:30px;font-weight:750;animation:awtarWelcomeFloat 2.5s ease-in-out infinite}
+#awtar-welcome h2{color:#e7cba3;font-size:30px;margin:0 0 12px}
+#awtar-welcome p{line-height:1.9;margin:8px 0;color:#e1ece5}
+#awtar-welcome .welcome-sub{font-size:13px;letter-spacing:2px;color:#c4d4cb}
+#awtar-welcome button{margin-top:24px;background:#e7cba3;color:#17382d;min-width:180px;font-weight:700}
+@keyframes awtarWelcomeIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+@keyframes awtarWelcomeFloat{50%{transform:translateY(-7px)}}
+@media(prefers-reduced-motion:reduce){#awtar-welcome,#awtar-welcome *{animation:none!important;transition:none!important}}
+@media print{#awtar-welcome{display:none!important}}
+</style></head><body><section id="awtar-welcome" dir="rtl" aria-label="مرحباً بك في برنامج رواتب أوتار"><div class="welcome-card"><div class="welcome-mark" aria-hidden="true">A</div><p class="welcome-sub">AWTAR STAFF PRO</p><h2 aria-label="نورت أوتار">نورت <span id="awtar-welcome-name" aria-hidden="true" style="display:inline-block;min-width:85px;text-align:right"></span></h2><p>أهلاً وسهلاً بك في برنامج الرواتب<br>مطعم وكافيه أوتار</p><p>إدارة مرتبة… وشغل أسهل كل يوم</p><button type="button" id="awtar-welcome-enter">دخول البرنامج ←</button></div></section><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
 const KEY='awtar_staff_pro_v4';
 let db, storage, revision, pendingSave=Promise.resolve();
 function preparePayrollData(data){
@@ -472,7 +485,29 @@ async function sendAllSms(){if(smsBusy)return;let text=$('smsText').value.trim()
 
 startPayroll();
 
+</script><script>
+(function(){
+const welcome=document.getElementById('awtar-welcome');
+const enter=document.getElementById('awtar-welcome-enter');
+let timer;
+function dismiss(){
+clearTimeout(timer);
+if(!welcome||welcome.classList.contains('leaving'))return;
+const hadFocus=welcome.contains(document.activeElement);
+welcome.classList.add('leaving');
+setTimeout(function(){welcome.remove();if(hadFocus){const input=document.querySelector('#loginroot input');if(input)input.focus();}},420);
+}
+enter.addEventListener('click',dismiss);
+const name=document.getElementById('awtar-welcome-name');
+const letters=Array.from('أوتار');
+let letterIndex=0;
+function typeNext(){
+if(welcome.classList.contains('leaving'))return;
+name.textContent=letters.slice(0,++letterIndex).join('');
+timer=setTimeout(letterIndex<letters.length?typeNext:dismiss,letterIndex<letters.length?350:2200);
+}
+if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){
+name.textContent=letters.join('');timer=setTimeout(dismiss,2200);
+}else{timer=setTimeout(typeNext,500);}
+})();
 </script></body></html>
-
-
-
