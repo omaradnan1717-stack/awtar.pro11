@@ -6,19 +6,30 @@
 <style>.worker-list-actions{display:flex;align-items:center;gap:8px;margin-inline-start:auto}
 .worker-list-photo{display:block;width:40px;height:40px;flex:none;border:1px solid #d6e3d9;border-radius:50%;object-fit:cover}</style>
 <style id="awtar-welcome-style">
-#awtar-welcome{position:fixed;inset:0;z-index:100000;display:grid;place-items:center;padding:24px;background:radial-gradient(circle at 20% 15%,#426c54,#17382d 65%);color:#fff;text-align:center;transition:opacity .4s,visibility .4s}
-#awtar-welcome.leaving{opacity:0;visibility:hidden;pointer-events:none}
-#awtar-welcome .welcome-card{width:min(390px,100%);animation:awtarWelcomeIn .7s ease both}
-#awtar-welcome .welcome-mark{width:88px;height:88px;border:1px solid #e7cba366;border-radius:26px;display:grid;place-items:center;margin:0 auto 24px;color:#e7cba3;font-size:30px;font-weight:750;animation:awtarWelcomeFloat 2.5s ease-in-out infinite}
-#awtar-welcome h2{color:#e7cba3;font-size:30px;margin:0 0 12px}
-#awtar-welcome p{line-height:1.9;margin:8px 0;color:#e1ece5}
-#awtar-welcome .welcome-sub{font-size:13px;letter-spacing:2px;color:#c4d4cb}
-#awtar-welcome button{margin-top:24px;background:#e7cba3;color:#17382d;min-width:180px;font-weight:700}
-@keyframes awtarWelcomeIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
-@keyframes awtarWelcomeFloat{50%{transform:translateY(-7px)}}
+#awtar-welcome{position:fixed;inset:0;z-index:100000;display:flex;align-items:center;justify-content:center;overflow:hidden;padding:28px;background:#0b201a;color:#f4ead8;text-align:center;isolation:isolate;transition:opacity .65s ease,transform .65s ease,visibility .65s}
+#awtar-welcome:before{content:"";position:absolute;inset:-25%;z-index:-1;background:radial-gradient(ellipse at 50% 40%,#305a444d,transparent 55%);animation:awtarAmbient 5s ease both}
+#awtar-welcome:after{content:"";position:absolute;inset:16px;border:1px solid #c6aa7030;pointer-events:none}
+#awtar-welcome.leaving{opacity:0;transform:scale(1.025);visibility:hidden;pointer-events:none}
+#awtar-welcome .welcome-card{width:min(360px,100%);position:relative;animation:awtarWelcomeIn 1s ease both}
+#awtar-welcome .welcome-emblem{width:64px;height:64px;margin:0 auto 30px;color:#d4ba83}
+#awtar-welcome .welcome-eyebrow{font-size:10px;letter-spacing:5px;color:#baaa88;margin:0 0 18px;direction:ltr}
+#awtar-welcome h2{height:108px;display:flex;align-items:center;justify-content:center;margin:0;color:#ead3a2;font-family:Tahoma,Arial,sans-serif;font-size:76px;font-weight:400;line-height:1.4;text-shadow:0 4px 40px #d4ba8320}
+#awtar-welcome-name{display:inline-block;min-width:215px;text-align:center}
+#awtar-welcome .welcome-rule{height:1px;width:64px;margin:22px auto;background:linear-gradient(90deg,transparent,#c6aa70,transparent)}
+#awtar-welcome .welcome-business{font-size:17px;font-weight:400;margin:0;color:#e3e8dd;line-height:1.8}
+#awtar-welcome .welcome-caption{font-size:12px;color:#8fa79b;margin:10px 0 0;line-height:1.8}
+#awtar-welcome .welcome-progress{height:2px;width:100px;overflow:hidden;margin:40px auto 0;background:#ffffff12;direction:rtl;border-radius:4px}
+#awtar-welcome .welcome-progress i{height:100%;display:block;transform-origin:right;background:#d4ba83;animation:awtarProgress 4.1s linear both}
+#awtar-welcome button{margin-top:22px;border:0;background:transparent;color:#9db1a5;padding:12px 24px;font-size:12px;font-family:inherit;cursor:pointer}
+#awtar-welcome button:focus-visible{outline:1px solid #d4ba83;outline-offset:3px}
+#awtar-welcome .welcome-footer{position:absolute;bottom:max(38px,env(safe-area-inset-bottom));left:0;right:0;font-size:9px;letter-spacing:3px;color:#728d7d;direction:ltr}
+@keyframes awtarWelcomeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+@keyframes awtarAmbient{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+@keyframes awtarProgress{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+@media(max-height:600px){#awtar-welcome .welcome-emblem{margin-bottom:10px;width:44px;height:44px}#awtar-welcome .welcome-progress{margin-top:18px}#awtar-welcome .welcome-footer{bottom:24px}}
 @media(prefers-reduced-motion:reduce){#awtar-welcome,#awtar-welcome *{animation:none!important;transition:none!important}}
 @media print{#awtar-welcome{display:none!important}}
-</style></head><body><section id="awtar-welcome" dir="rtl" aria-label="مرحباً بك في برنامج رواتب أوتار"><div class="welcome-card"><div class="welcome-mark" aria-hidden="true">A</div><p class="welcome-sub">AWTAR STAFF PRO</p><h2 aria-label="نورت أوتار">نورت <span id="awtar-welcome-name" aria-hidden="true" style="display:inline-block;min-width:85px;text-align:right"></span></h2><p>أهلاً وسهلاً بك في برنامج الرواتب<br>مطعم وكافيه أوتار</p><p>إدارة مرتبة… وشغل أسهل كل يوم</p><button type="button" id="awtar-welcome-enter">دخول البرنامج ←</button></div></section><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
+</style></head><body><section id="awtar-welcome" dir="rtl" aria-label="أوتار، إدارة الرواتب والكادر"><div class="welcome-card"><svg class="welcome-emblem" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 3 60 32 32 61 4 32Z" stroke="currentColor" stroke-opacity=".45"/><path d="M32 12 51 32 32 52 13 32Z" stroke="currentColor" stroke-opacity=".35"/><path d="M23 42 32 21 41 42M27 34h10" stroke="currentColor" stroke-width="1.4"/><circle cx="32" cy="3" r="2" fill="currentColor"/></svg><p class="welcome-eyebrow">WELCOME TO AWTAR</p><h2 aria-label="أوتار"><span id="awtar-welcome-name" aria-hidden="true"></span></h2><div class="welcome-rule"></div><p class="welcome-business">مطعم وكافيه أوتار</p><p class="welcome-caption">إدارة الرواتب والكادر</p><div class="welcome-progress" aria-hidden="true"><i></i></div><button type="button" id="awtar-welcome-enter">الدخول مباشرة ←</button></div><div class="welcome-footer">AWTAR · STAFF MANAGEMENT</div></section><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
 const KEY='awtar_staff_pro_v4';
 let db, storage, revision, pendingSave=Promise.resolve();
 function preparePayrollData(data){
@@ -495,7 +506,7 @@ clearTimeout(timer);
 if(!welcome||welcome.classList.contains('leaving'))return;
 const hadFocus=welcome.contains(document.activeElement);
 welcome.classList.add('leaving');
-setTimeout(function(){welcome.remove();if(hadFocus){const input=document.querySelector('#loginroot input');if(input)input.focus();}},420);
+setTimeout(function(){welcome.remove();if(hadFocus){const input=document.querySelector('#loginroot input');if(input)input.focus();}},700);
 }
 enter.addEventListener('click',dismiss);
 const name=document.getElementById('awtar-welcome-name');
