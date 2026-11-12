@@ -41,7 +41,29 @@ input[type=checkbox]{accent-color:#1455e8}
 #awtar-welcome{background:linear-gradient(145deg,#0734aa,#095bf0 60%,#039bd6)}
 #awtar-welcome .welcome-progress i{background:#ff8179}
 @media print{.update-row{display:none!important}}
-</style></head><body><section id="awtar-welcome" dir="rtl" aria-label="أوتار، إدارة الرواتب والكادر"><div class="welcome-card"><svg class="welcome-emblem" viewBox="0 0 64 64" fill="none" aria-hidden="true"><path d="M32 3 60 32 32 61 4 32Z" stroke="currentColor" stroke-opacity=".45"/><path d="M32 12 51 32 32 52 13 32Z" stroke="currentColor" stroke-opacity=".35"/><path d="M23 42 32 21 41 42M27 34h10" stroke="currentColor" stroke-width="1.4"/><circle cx="32" cy="3" r="2" fill="currentColor"/></svg><p class="welcome-eyebrow">WELCOME TO AWTAR</p><h2 aria-label="أوتار"><span id="awtar-welcome-name" aria-hidden="true"></span></h2><div class="welcome-rule"></div><p class="welcome-business">مطعم وكافيه أوتار</p><p class="welcome-caption">إدارة الرواتب والكادر</p><div class="welcome-progress" aria-hidden="true"><i></i></div><button type="button" id="awtar-welcome-enter">الدخول مباشرة ←</button></div><div class="welcome-footer">AWTAR · STAFF MANAGEMENT</div></section><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="update-row no-print"><button type="button" id="awtar-update-button" onclick="updateAwtarApp(this)">↻ تحديث البرنامج</button><span id="awtar-update-status" role="status" aria-live="polite">AWTAR · النسخة الزرقاء</span></div><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
+</style><style id="awtar-animated-splash">
+#awtar-welcome{background:linear-gradient(125deg,#0926cf 0%,#0459ff 58%,#05c8e5 120%);padding:32px;transition:opacity .7s ease,visibility .7s,transform .7s ease}
+#awtar-welcome:before{inset:-30%;background:radial-gradient(ellipse at 70% 25%,#22d9ff55,transparent 55%);animation:splashGlow 5s ease both}
+#awtar-welcome:after{display:none}
+#awtar-welcome .splash-center{width:min(480px,100%);margin-top:-3vh}
+#awtar-welcome .splash-word{position:relative;overflow:hidden;font-family:Arial,Helvetica,sans-serif;font-weight:900;font-size:clamp(46px,15.5vw,88px);letter-spacing:-.045em;line-height:1.3;color:#fff;text-shadow:0 6px 18px #0027a42b;animation:splashReveal 1.2s cubic-bezier(.16,1,.3,1) both}
+#awtar-welcome .splash-word:after{content:"";position:absolute;inset:-50% -40%;background:linear-gradient(115deg,transparent 42%,#ffffff00 45%,#ffffffaa 49%,#fff 50%,#ffffff22 54%,transparent 58%);mix-blend-mode:screen;transform:translateX(-110%);animation:splashShine 1.4s ease-in-out 1s both;pointer-events:none}
+#awtar-welcome .splash-accent{width:76px;height:4px;background:#ff8589;border-radius:5px;margin:24px auto 36px;animation:splashAccent .7s ease .65s both}
+#awtar-welcome h2.splash-greeting{display:block;height:auto;font-family:Tahoma,Arial,sans-serif;font-size:clamp(23px,6.5vw,34px);font-weight:600;line-height:1.8;margin:0;color:#fff;animation:splashRise .9s ease .8s both}
+#awtar-welcome p.splash-caption{font-size:clamp(15px,4.5vw,22px);color:#b8e8ff;margin:6px 0 0;animation:splashRise .9s ease 1s both}
+#awtar-welcome .splash-dots{position:absolute;bottom:17%;left:0;right:0;display:flex;justify-content:center;align-items:center;gap:10px;direction:ltr}
+#awtar-welcome .splash-dots i{display:block;width:5px;height:5px;background:#e2f7ff;border-radius:50%;animation:splashDot 1.1s ease-in-out infinite}
+#awtar-welcome .splash-dots i:nth-child(2){animation-delay:.16s}#awtar-welcome .splash-dots i:nth-child(3){animation-delay:.32s}
+#awtar-welcome .splash-footer{position:absolute;bottom:7%;left:0;right:0;font:10px Arial,sans-serif;letter-spacing:6px;direction:ltr;color:#e0f3ff;animation:splashRise 1s ease .7s both}
+#awtar-welcome button{position:absolute;top:max(22px,env(safe-area-inset-top));left:18px;margin:0;font-size:11px;color:#d6edff;background:transparent;padding:12px;min-width:0}
+@keyframes splashReveal{from{opacity:0;transform:translateY(14px) scale(.92);filter:blur(7px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+@keyframes splashShine{from{transform:translateX(-110%)}to{transform:translateX(110%)}}
+@keyframes splashAccent{from{opacity:0;transform:scaleX(0)}to{opacity:1;transform:scaleX(1)}}
+@keyframes splashRise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+@keyframes splashDot{0%,70%,100%{opacity:.55;transform:scale(.8)}35%{opacity:1;transform:scale(1.7)}}
+@keyframes splashGlow{from{opacity:.3;transform:scale(.9)}to{opacity:1;transform:scale(1.1)}}
+@media(prefers-reduced-motion:reduce){#awtar-welcome,#awtar-welcome *{animation:none!important;transition:none!important}#awtar-welcome .splash-word:after{display:none}}
+</style></head><body><section id="awtar-welcome" dir="rtl" aria-label="أهلاً بك في أوتار"><div class="splash-center"><div class="splash-word" dir="ltr" aria-label="AWTAR">AWTAR</div><div class="splash-accent"></div><h2 class="splash-greeting">أهلاً بك في أوتار</h2><p class="splash-caption">إدارة الرواتب والكادر</p></div><div class="splash-dots" aria-hidden="true"><i></i><i></i><i></i></div><div class="splash-footer">AWTAR STAFF</div><button id="awtar-welcome-enter" type="button" aria-label="تخطي الترحيب">تخطي ←</button></section><header><h1>AWTAR STAFF PRO</h1><p>إدارة موظفي مطعم وكافيه أوتار</p><div class="update-row no-print"><button type="button" id="awtar-update-button" onclick="updateAwtarApp(this)">↻ تحديث البرنامج</button><span id="awtar-update-status" role="status" aria-live="polite">AWTAR · النسخة الزرقاء</span></div><div class="grid" id="summary"></div></header><nav class="tabs" id="tabs"></nav><main class="wrap" id="main"></main><div id="modalroot"></div><script>
 const KEY='awtar_staff_pro_v4';
 let db, storage, revision, pendingSave=Promise.resolve();
 function preparePayrollData(data){
@@ -514,24 +536,15 @@ const welcome=document.getElementById('awtar-welcome');
 const enter=document.getElementById('awtar-welcome-enter');
 let timer;
 function dismiss(){
-clearTimeout(timer);
-if(!welcome||welcome.classList.contains('leaving'))return;
-const hadFocus=welcome.contains(document.activeElement);
-welcome.classList.add('leaving');
-setTimeout(function(){welcome.remove();if(hadFocus){const input=document.querySelector('#loginroot input');if(input)input.focus();}},700);
+ clearTimeout(timer);
+ if(!welcome||welcome.classList.contains('leaving'))return;
+ const focused=welcome.contains(document.activeElement);
+ welcome.classList.add('leaving');
+ setTimeout(function(){welcome.remove();if(focused){const input=document.querySelector('#loginroot input');if(input)input.focus();}},720);
 }
 enter.addEventListener('click',dismiss);
-const name=document.getElementById('awtar-welcome-name');
-const letters=Array.from('أوتار');
-let letterIndex=0;
-function typeNext(){
-if(welcome.classList.contains('leaving'))return;
-name.textContent=letters.slice(0,++letterIndex).join('');
-timer=setTimeout(letterIndex<letters.length?typeNext:dismiss,letterIndex<letters.length?350:2200);
-}
-if(window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches){
-name.textContent=letters.join('');timer=setTimeout(dismiss,2200);
-}else{timer=setTimeout(typeNext,500);}
+const reduced=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+timer=setTimeout(dismiss,reduced?2200:4600);
 })();
 </script><script>
 async function updateAwtarApp(button){
