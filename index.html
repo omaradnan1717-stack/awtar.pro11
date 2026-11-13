@@ -238,7 +238,7 @@ function normalizeWorkerName(name){
 }
 function workerList(former){
   const query=normalizeWorkerName(workerSearch[tab]);
-  const workers=db.workers.filter(w=>workerTab(w)===tab && (w.active===false)===former && normalizeWorkerName(w.name).includes(query));
+  const workers=db.workers.filter(w=>workerTab(w)===tab && (w.active===false)===former && normalizeWorkerName(w.name).includes(query)).sort((a,b)=>String(a.name||'').localeCompare(String(b.name||''),'ar',{sensitivity:'base'}));
   if(!workers.length){
     const message=query?'ماكو عامل يطابق البحث':former?'لا يوجد':(tab==='delivery'?'لا يوجد عمال دلفري. أضف أول عامل.':'لا يوجد عمال. أضف أول عامل.');
     return `<div class="empty">${message}</div>`;
