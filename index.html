@@ -595,7 +595,7 @@ function drawPaidExpense(){
  const date=$('paidExpenseDate')?.value,group=$('paidExpenseGroup')?.value||'all';
  if(!date)return;
  const rows=paidExpenseRows(date,group),workers=[...db.workers,...(db.trash||[])];
- $('paidExpenseResult').innerHTML='<div class="big"><small>المصروف المسجل فعلياً</small><strong>'+fmt(rows.reduce((a,o)=>a+(Number(o.amount)||0),0))+'</strong></div><p>'+esc(paidExpenseText(date,group))+'</p><button onclick="copyPaidExpense()">نسخ لتسجيله بالمصروفات</button>'+rows.map(o=>'<div class="item between"><span>'+esc(workers.find(w=>w.id===o.worker)?.name||'عامل غير موجود')+'</span><strong>'+fmt(o.amount)+'</strong></div>').join('')+'<p class="muted">يشمل صرف الراتب فقط. سجّل المبلغ بالمصروفات يدوياً مرة واحدة؛ النسخ لا يرحّله تلقائياً.</p>';
+ $('paidExpenseResult').innerHTML='<div class="big"><small>المصروف المسجل فعلياً</small><strong>'+fmt(rows.reduce((a,o)=>a+(Number(o.amount)||0),0))+'</strong></div><p>'+esc(paidExpenseText(date,group))+'</p><button class="primary" onclick="transferPaidExpense()">ترحيل إلى المصروفات</button> <button onclick="copyPaidExpense()">نسخ المجموع</button>'+rows.map(o=>'<div class="item between"><span>'+esc(workers.find(w=>w.id===o.worker)?.name||'عامل غير موجود')+'</span><strong>'+fmt(o.amount)+'</strong></div>').join('')+'<p class="muted">يشمل صرف الراتب فقط. زر الترحيل يفتح صرفيات أوتار ويستبعد العمليات المرحّلة سابقاً. لا ترحّل مبالغ سجّلتها يدوياً من قبل.</p>';
 }
 async function copyPaidExpense(){
  const text=paidExpenseText($('paidExpenseDate').value,$('paidExpenseGroup').value);
@@ -609,6 +609,19 @@ function showPaidExpenseConfirmation(operation){
 const expenseOriginalRender=render;
 render=function(){expenseOriginalRender();if(unlocked&&['salaries','delivery','workers'].includes(tab)){ $('main').insertAdjacentHTML('beforeend',paidExpensePanel());drawPaidExpense();}};
 
+let payrollTransferWindow=null,payrollTransferPayload=null;
+function transferPaidExpense(){
+ const date=$('paidExpenseDate').value,group=$('paidExpenseGroup').value;
+ const rows=paidExpenseRows(date,group),workers=[...db.workers,...(db.trash||[])];
+ if(!rows.length)return alert('لا توجد رواتب مصروفة بهذا التاريخ');
+ payrollTransferPayload={type:'awtar-payroll-transfer-v1',rows:rows.map(o=>({id:String(o.id),date:o.date,amount:Number(o.amount),name:workers.find(w=>w.id===o.worker)?.name||'عامل',group:workers.find(w=>w.id===o.worker)?.delivery?'delivery':'workers'}))};
+ payrollTransferWindow=window.open('https://omaradnan1717-stack.github.io/awtar-20-/?payroll_transfer=1','awtarPayrollExpenses');
+ if(!payrollTransferWindow)alert('اسمح بفتح النافذة حتى تفتح المصروفات');
+}
+window.addEventListener('message',e=>{
+ if(e.origin!=='https://omaradnan1717-stack.github.io'||e.source!==payrollTransferWindow)return;
+ if(e.data?.type==='awtar-payroll-ready-v1'&&payrollTransferPayload)e.source.postMessage(payrollTransferPayload,e.origin);
+});
 startPayroll();
 
 </script><script>
@@ -647,4 +660,3 @@ async function updateAwtarApp(button){
  finally{clearTimeout(timeout);}
 }
 </script></body></html>
-
