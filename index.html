@@ -79,7 +79,16 @@ function withEmployeeNumbers(data){
  };
  return {...data,workers:data.workers.map(assign),trash:(data.trash||[]).map(assign),config:{...data.config,employeeNumberCounter:counter}};
 }
-function employeeNumber(w){return String(w.employeeNumber||'').padStart(3,'0');}
+function compareWorkerDisplay(a,b){
+ const isManager=w=>String(w.name||'').trim().replace(/\s+/g,' ').toLowerCase()==='omar adnan';
+ return Number(isManager(b))-Number(isManager(a))||String(a.name||'').localeCompare(String(b.name||''),'ar',{sensitivity:'base'})||String(a.id).localeCompare(String(b.id));
+}
+function employeeNumber(w){
+ const source=db.workers.some(x=>x.id===w.id)?db.workers:(db.trash||[]);
+ const list=source.filter(x=>!!x.delivery===!!w.delivery&&(x.active===false)===(w.active===false)).slice().sort(compareWorkerDisplay);
+ const index=list.findIndex(x=>x.id===w.id);
+ return index<0?'—':String(index+1).padStart(3,'0');
+}
 async function ensureEmployeeNumbers(){
  const numbered=withEmployeeNumbers(db);
  if(JSON.stringify(numbered)!==JSON.stringify(db)&&!await commitPayrollChange(numbered))throw Error('تعذّر حفظ أرقام الموظفين');
@@ -305,7 +314,7 @@ function normalizeWorkerName(name){
 }
 function workerList(former){
   const query=normalizeWorkerName(workerSearch[tab]);
-  const workers=db.workers.filter(w=>workerTab(w)===tab && (w.active===false)===former && (normalizeWorkerName(w.name).includes(query)||employeeNumber(w).includes(query))).sort((a,b)=>{const isManager=w=>String(w.name||'').trim().replace(/\s+/g,' ').toLowerCase()==='omar adnan';return Number(isManager(b))-Number(isManager(a))||String(a.name||'').localeCompare(String(b.name||''),'ar',{sensitivity:'base'});});
+  const workers=db.workers.filter(w=>workerTab(w)===tab && (w.active===false)===former && (normalizeWorkerName(w.name).includes(query)||employeeNumber(w).includes(query))).sort(compareWorkerDisplay);
   if(!workers.length){
     const message=query?'ماكو عامل يطابق البحث':former?'لا يوجد':(tab==='delivery'?'لا يوجد عمال دلفري. أضف أول عامل.':'لا يوجد عمال. أضف أول عامل.');
     return `<div class="empty">${message}</div>`;
