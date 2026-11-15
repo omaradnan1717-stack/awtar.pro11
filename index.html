@@ -694,23 +694,23 @@ async function sendAllSms(){if(smsBusy)return;let text=$('smsText').value.trim()
 
 function paidExpenseRows(date,group='all'){
  const workers=[...db.workers,...(db.trash||[])];
- return db.ops.filter(o=>o.type==='paid'&&o.date===date).filter(o=>{
+ return db.ops.filter(o=>(o.type==='paid'||o.type==='advance')&&o.date===date).filter(o=>{
  const w=workers.find(w=>w.id===o.worker);
  return group==='all'||(group==='delivery'?w?.delivery===true:w&&!w.delivery);
  });
 }
 function paidExpensePanel(){
- return '<section class="panel no-print"><h2>مصروف الرواتب الفعلي</h2><label>تاريخ الصرف</label><input type="date" id="paidExpenseDate" value="'+todayISO()+'" onchange="drawPaidExpense()"><label>الفئة</label><select id="paidExpenseGroup" onchange="drawPaidExpense()"><option value="all">العمال والدلفري</option><option value="workers">العمال</option><option value="delivery">الدلفري</option></select><div id="paidExpenseResult"></div></section>';
+ return '<section class="panel no-print"><h2>مصروف الرواتب والسلف الفعلي</h2><label>تاريخ الصرف</label><input type="date" id="paidExpenseDate" value="'+todayISO()+'" onchange="drawPaidExpense()"><label>الفئة</label><select id="paidExpenseGroup" onchange="drawPaidExpense()"><option value="all">العمال والدلفري</option><option value="workers">العمال</option><option value="delivery">الدلفري</option></select><div id="paidExpenseResult"></div></section>';
 }
 function paidExpenseText(date,group){
  const rows=paidExpenseRows(date,group),total=rows.reduce((a,o)=>a+(Number(o.amount)||0),0);
- return (group==='delivery'?'رواتب الدلفري':group==='workers'?'رواتب العمال':'رواتب العمال والدلفري')+' — '+dateDMY(date)+' — '+fmt(total);
+ return (group==='delivery'?'رواتب وسلف الدلفري':group==='workers'?'رواتب وسلف العمال':'رواتب وسلف العمال والدلفري')+' — '+dateDMY(date)+' — '+fmt(total);
 }
 function drawPaidExpense(){
  const date=$('paidExpenseDate')?.value,group=$('paidExpenseGroup')?.value||'all';
  if(!date)return;
  const rows=paidExpenseRows(date,group),workers=[...db.workers,...(db.trash||[])];
- $('paidExpenseResult').innerHTML='<div class="big"><small>المصروف المسجل فعلياً</small><strong>'+fmt(rows.reduce((a,o)=>a+(Number(o.amount)||0),0))+'</strong></div><p>'+esc(paidExpenseText(date,group))+'</p><button class="primary" onclick="transferPaidExpense()">ترحيل إلى المصروفات</button> <button onclick="copyPaidExpense()">نسخ المجموع</button>'+rows.map(o=>'<div class="item between"><span>'+esc(workers.find(w=>w.id===o.worker)?.name||'عامل غير موجود')+'</span><strong>'+fmt(o.amount)+'</strong></div>').join('')+'<p class="muted">يشمل صرف الراتب فقط. زر الترحيل يفتح صرفيات أوتار ويستبعد العمليات المرحّلة سابقاً. لا ترحّل مبالغ سجّلتها يدوياً من قبل.</p>';
+ $('paidExpenseResult').innerHTML='<div class="big"><small>المصروف المسجل فعلياً</small><strong>'+fmt(rows.reduce((a,o)=>a+(Number(o.amount)||0),0))+'</strong></div><p>'+esc(paidExpenseText(date,group))+'</p><button class="primary" onclick="transferPaidExpense()">ترحيل إلى المصروفات</button> <button onclick="copyPaidExpense()">نسخ المجموع</button>'+rows.map(o=>'<div class="item between"><span>'+esc(workers.find(w=>w.id===o.worker)?.name||'عامل غير موجود')+'</span><strong>'+fmt(o.amount)+'</strong></div>').join('')+'<p class="muted">يشمل صرف الراتب والسلف النقدية. تُخصم السلفة من المستحق ولا تُضاف مرة ثانية عند صرف الراتب. زر الترحيل يفتح صرفيات أوتار ويستبعد العمليات المرحّلة سابقاً. لا ترحّل مبالغ سجّلتها يدوياً من قبل.</p>';
 }
 async function copyPaidExpense(){
  const text=paidExpenseText($('paidExpenseDate').value,$('paidExpenseGroup').value);
@@ -728,8 +728,8 @@ let payrollTransferWindow=null,payrollTransferPayload=null;
 function transferPaidExpense(){
  const date=$('paidExpenseDate').value,group=$('paidExpenseGroup').value;
  const rows=paidExpenseRows(date,group),workers=[...db.workers,...(db.trash||[])];
- if(!rows.length)return alert('لا توجد رواتب مصروفة بهذا التاريخ');
- payrollTransferPayload={type:'awtar-payroll-transfer-v1',rows:rows.map(o=>({id:String(o.id),date:o.date,amount:Number(o.amount),name:workers.find(w=>w.id===o.worker)?.name||'عامل',group:workers.find(w=>w.id===o.worker)?.delivery?'delivery':'workers'}))};
+ if(!rows.length)return alert('لا توجد رواتب أو سلف مصروفة بهذا التاريخ');
+ payrollTransferPayload={type:'awtar-payroll-transfer-v1',rows:rows.map(o=>({id:String(o.id),kind:o.type,date:o.date,amount:Number(o.amount),name:workers.find(w=>w.id===o.worker)?.name||'عامل',group:workers.find(w=>w.id===o.worker)?.delivery?'delivery':'workers'}))};
  payrollTransferWindow=window.open('https://omaradnan1717-stack.github.io/awtar-20-/?payroll_transfer=1','awtarPayrollExpenses');
  if(!payrollTransferWindow)alert('اسمح بفتح النافذة حتى تفتح المصروفات');
 }
