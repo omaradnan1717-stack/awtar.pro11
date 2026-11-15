@@ -435,18 +435,63 @@ function updateDeliveryPreview(form){
   form.elements.amount.value=Number(form.elements.days.value)*Number(form.elements.rate.value);
 }
 function safriReceiptFields(o){return `<fieldset style="border:1px solid #dce6f5;border-radius:12px;margin-top:16px"><legend>صورة الوصل (اختياري)</legend><div class="actions"><button type="button" onclick="this.form.querySelector('#safriGallery').click()">من الاستوديو</button><button type="button" onclick="this.form.querySelector('#safriCamera').click()">فتح الكاميرا</button></div><input hidden id="safriGallery" type="file" accept="image/*" onchange="readSafriReceipt(this)"><input hidden id="safriCamera" type="file" accept="image/*" capture="environment" onchange="readSafriReceipt(this)"><div id="safriReceiptPreview">${o.receipt?`<img src="${esc(o.receipt)}" alt="صورة الوصل" style="max-width:100%;max-height:220px;object-fit:contain">`:''}</div><p id="safriReceiptStatus" role="status"></p><button type="button" onclick="this.form.receiptImage='';this.form.querySelector('#safriReceiptPreview').innerHTML=''">حذف الصورة</button></fieldset>`}
+
+function scanHomography(points){
+ const target=[[0,0],[1,0],[1,1],[0,1]],m=[];
+ target.forEach(([u,v],i)=>{const {x,y}=points[i];m.push([u,v,1,0,0,0,-x*u,-x*v,x],[0,0,0,u,v,1,-y*u,-y*v,y]);});
+ for(let k=0;k<8;k++){let p=k;for(let j=k+1;j<8;j++)if(Math.abs(m[j][k])>Math.abs(m[p][k]))p=j;
+ [m[k],m[p]]=[m[p],m[k]];const d=m[k][k];if(Math.abs(d)<1e-9)throw Error('حرّك الزوايا حتى تحدد مساحة الوصل');
+ for(let j=k;j<9;j++)m[k][j]/=d;
+ for(let i=0;i<8;i++)if(i!==k){const f=m[i][k];for(let j=k;j<9;j++)m[i][j]-=f*m[k][j];}}
+ return m.map(r=>r[8]);
+}
+function scanWarp(source,points,enhance){
+ for(let i=0;i<4;i++){const a=points[i],b=points[(i+1)%4],c=points[(i+2)%4];if((b.x-a.x)*(c.y-b.y)-(b.y-a.y)*(c.x-b.x)<20)throw Error('خلّي الزوايا بالترتيب حول الوصل بدون تقاطع');}
+ const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
+ const w=Math.round(Math.max(dist(points[0],points[1]),dist(points[3],points[2]))),h=Math.round(Math.max(dist(points[0],points[3]),dist(points[1],points[2])));
+ if(w<30||h<30)throw Error('المساحة صغيرة؛ وسّع حدود الوصل');
+ const out=document.createElement('canvas');out.width=w;out.height=h;
+ const ctx=out.getContext('2d'),src=source.getContext('2d').getImageData(0,0,source.width,source.height),dst=ctx.createImageData(w,h),a=scanHomography(points);
+ for(let y=0;y<h;y++)for(let x=0;x<w;x++){const u=x/(w-1),v=y/(h-1),z=a[6]*u+a[7]*v+1;
+ const sx=Math.max(0,Math.min(source.width-1,(a[0]*u+a[1]*v+a[2])/z)),sy=Math.max(0,Math.min(source.height-1,(a[3]*u+a[4]*v+a[5])/z)),ix=Math.floor(sx),iy=Math.floor(sy),fx=sx-ix,fy=sy-iy,k=(y*w+x)*4;
+ for(let c=0;c<3;c++){const at=(xx,yy)=>src.data[(Math.min(source.height-1,yy)*source.width+Math.min(source.width-1,xx))*4+c];
+ let n=at(ix,iy)*(1-fx)*(1-fy)+at(ix+1,iy)*fx*(1-fy)+at(ix,iy+1)*(1-fx)*fy+at(ix+1,iy+1)*fx*fy;dst.data[k+c]=enhance?Math.max(0,Math.min(255,(n-128)*1.18+140)):n;}dst.data[k+3]=255;}
+ ctx.putImageData(dst,0,0);return out;
+}
+function openSafriScanner(source,form){
+ const root=document.createElement('div');root.className='overlay';root.style.zIndex='100002';root.setAttribute('role','dialog');root.setAttribute('aria-modal','true');root.setAttribute('aria-label','سكانر وصل السفري');
+ root.innerHTML='<div class="modal" dir="rtl"><h2>سكانر وصل السفري</h2><p>اسحب الدوائر الأربع على زوايا الوصل، ثم اضغط قص ومعاينة.</p><canvas style="width:100%;display:block;touch-action:none;direction:ltr;border-radius:8px"></canvas><label><input type="checkbox" style="width:auto" checked> تحسين وضوح الوصل</label><p role="status"></p><div class="actions"><button type="button" data-action="preview" class="primary">قص ومعاينة</button><button type="button" data-action="reset">إعادة التحديد</button><button type="button" data-action="save" class="primary" disabled>اعتماد الصورة</button><button type="button" data-action="cancel">إلغاء</button></div></div>';
+ document.body.append(root);
+ const cv=root.querySelector('canvas'),cx=cv.getContext('2d'),status=root.querySelector('[role=status]'),save=root.querySelector('[data-action=save]'),enhance=root.querySelector('input');
+ cv.width=source.width;cv.height=source.height;let points,drag=-1,result=null;
+ const draw=()=>{cx.clearRect(0,0,cv.width,cv.height);cx.drawImage(result||source,0,0,cv.width,cv.height);if(result)return;
+ cx.fillStyle='#0006';cx.beginPath();cx.rect(0,0,cv.width,cv.height);cx.moveTo(points[0].x,points[0].y);for(let i=3;i>=0;i--)cx.lineTo(points[i].x,points[i].y);cx.closePath();cx.fill('evenodd');
+ const r=cv.width/22;cx.strokeStyle='#00ddff';cx.lineWidth=cv.width/200;cx.beginPath();points.forEach((p,i)=>i?cx.lineTo(p.x,p.y):cx.moveTo(p.x,p.y));cx.closePath();cx.stroke();
+ points.forEach((p,i)=>{cx.beginPath();cx.arc(p.x,p.y,r,0,Math.PI*2);cx.fillStyle='#1455e8';cx.fill();cx.strokeStyle='#fff';cx.stroke();cx.fillStyle='#fff';cx.font='bold '+r+'px sans-serif';cx.textAlign='center';cx.textBaseline='middle';cx.fillText(i+1,p.x,p.y);});};
+ const reset=()=>{result=null;save.disabled=true;points=[{x:0,y:0},{x:cv.width-1,y:0},{x:cv.width-1,y:cv.height-1},{x:0,y:cv.height-1}];status.textContent='حدد الزوايا يدوياً على حدود الورقة.';draw();};
+ const pos=e=>{const r=cv.getBoundingClientRect();return {x:Math.max(0,Math.min(cv.width-1,(e.clientX-r.left)*cv.width/r.width)),y:Math.max(0,Math.min(cv.height-1,(e.clientY-r.top)*cv.height/r.height))};};
+ cv.onpointerdown=e=>{if(result)return;const p=pos(e);drag=points.reduce((best,q,i)=>Math.hypot(q.x-p.x,q.y-p.y)<Math.hypot(points[best].x-p.x,points[best].y-p.y)?i:best,0);cv.setPointerCapture(e.pointerId);points[drag]=p;draw();};
+ cv.onpointermove=e=>{if(drag<0)return;points[drag]=pos(e);draw();};cv.onpointerup=cv.onpointercancel=()=>{drag=-1;};
+ enhance.onchange=()=>{if(result){result=null;save.disabled=true;draw();}};
+ root.querySelector('[data-action=preview]').onclick=()=>{try{result=scanWarp(source,points,enhance.checked);draw();save.disabled=false;status.textContent='معاينة الوصل بعد القص وتصحيح الميلان. اضغط اعتماد الصورة أو إعادة التحديد.';}catch(e){status.textContent=e.message;}};
+ root.querySelector('[data-action=reset]').onclick=reset;
+ const previous=document.activeElement;const close=()=>{root.remove();if(previous?.isConnected)previous.focus();};
+ root.querySelector('[data-action=cancel]').onclick=close;
+ save.onclick=()=>{if(!result||!form.isConnected){close();return;}form.receiptImage=result.toDataURL('image/jpeg',.9);form.querySelector('#safriReceiptPreview').innerHTML='<img alt="وصل السفري بعد المسح" style="max-width:100%;max-height:220px;object-fit:contain">';form.querySelector('#safriReceiptPreview img').src=form.receiptImage;form.querySelector('#safriReceiptStatus').textContent='تم تجهيز الوصل؛ اضغط حفظ العملية.';close();};
+ root.onkeydown=e=>{if(e.key==='Escape'){e.stopPropagation();close();}};reset();root.querySelector('button').focus();
+}
 async function readSafriReceipt(input){
  const form=input.form,file=input.files?.[0];if(!file)return;input.value='';
- if(file.type&&!file.type.startsWith('image/')){alert('اختر صورة');return}
- const buttons=[...form.querySelectorAll('button')];buttons.forEach(b=>b.disabled=true);
- const status=form.querySelector('#safriReceiptStatus');status.textContent='جارٍ تجهيز صورة الوصل…';
- const url=URL.createObjectURL(file);
- try{const im=new Image();await new Promise((resolve,reject)=>{im.onload=resolve;im.onerror=reject;im.src=url});
+ if(file.type&&!file.type.startsWith('image/')){alert('اختر صورة');return;}
+ const buttons=[...form.querySelectorAll('button')],states=buttons.map(b=>b.disabled);buttons.forEach(b=>b.disabled=true);
+ const status=form.querySelector('#safriReceiptStatus');status.textContent='جارٍ تجهيز صورة الوصل…';const url=URL.createObjectURL(file);
+ try{const im=new Image();await new Promise((resolve,reject)=>{im.onload=resolve;im.onerror=reject;im.src=url;});
  const scale=Math.min(1,1800/Math.max(im.naturalWidth,im.naturalHeight)),canvas=document.createElement('canvas');canvas.width=Math.max(1,Math.round(im.naturalWidth*scale));canvas.height=Math.max(1,Math.round(im.naturalHeight*scale));
  const ctx=canvas.getContext('2d');ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);ctx.drawImage(im,0,0,canvas.width,canvas.height);
- if(!form.isConnected)return;form.receiptImage=canvas.toDataURL('image/jpeg',.88);form.querySelector('#safriReceiptPreview').innerHTML=`<img src="${esc(form.receiptImage)}" alt="صورة الوصل" style="max-width:100%;max-height:220px;object-fit:contain">`;status.textContent='الصورة جاهزة؛ اضغط حفظ العملية.';
- }catch(error){if(form.isConnected)status.textContent='تعذّر فتح الصورة. جرّب صورة ثانية.'}finally{URL.revokeObjectURL(url);buttons.forEach(b=>b.disabled=false)}
+ if(form.isConnected){status.textContent='حدد حدود الوصل في السكانر.';openSafriScanner(canvas,form);}
+ }catch(error){if(form.isConnected)status.textContent='تعذّر فتح الصورة. جرّب صورة ثانية.';}finally{URL.revokeObjectURL(url);buttons.forEach((b,i)=>b.disabled=states[i]);}
 }
+
 function viewSafriReceipt(id){const o=db.ops.find(x=>x.id===id);if(!o?.receipt)return;modal(`<div class="between"><h2>وصل السفري · ${esc(o.meal||'وجبة')}</h2><button onclick="closeModal()">إغلاق ×</button></div><p>${esc(dateDMY(o.date))} · ${fmt(o.amount)}</p><img src="${esc(o.receipt)}" alt="صورة وصل السفري" style="width:100%;height:auto">`)}
 function openOp(type,id,shiftRate){let w=db.workers.find(x=>x.id===selected),o=db.ops.find(x=>x.id===id)||{},d=(o.date||todayISO()).split('-'),days=o.days||1,absenceMonthDays=new Date(+d[0],+d[1],0).getDate(),auto=Number(w.salary)/30*days;const shiftLabel=shiftRate===3000?'شفت واحد':'شفتين';modal(`<div class="between"><h2>${id?'تعديل':'تسجيل'} ${shiftRate?shiftLabel:names[type]} - ${esc(w.name)}</h2><button onclick="closeModal()">إغلاق ×</button></div><form onsubmit="saveOp(event,'${type}','${id||''}')"><label>التاريخ</label><div class="dategrid"><input name="day" type="number" min="1" max="31" value="${+d[2]}"><input name="month" type="number" min="1" max="12" value="${+d[1]}" oninput="updateAbsencePreview(this.form)"><input name="year" type="number" min="2020" max="2100" value="${+d[0]}" oninput="updateAbsencePreview(this.form)"></div>${type==='absence'?`<label>عدد أيام الغياب</label><input name="days" type="number" min="0.5" step="0.5" value="${days}" oninput="updateAbsencePreview(this.form)"><div class="muted"><span id="absenceHint">أساس احتساب أجر اليوم: 30 يوم | الخصم التلقائي: ${fmt(auto)}</span></div><label><input id="manual" type="checkbox" style="width:auto" onchange="updateAbsencePreview(this.form)" ${o.manual?'checked':''}> تعديل قيمة الخصم يدوياً</label>`:''}${type==='orders'?orderFields(o):type==='deliveryFee'?`<label>عدد الأيام</label><input name="days" type="number" min="1" step="1" required value="${o.days??''}" oninput="updateDeliveryPreview(this.form)">${shiftRate?`<p class="muted">${shiftLabel} · ${fmt(shiftRate)} باليوم</p><input type="hidden" name="rate" value="${shiftRate}">`:`<label>النسبة لليوم</label><select name="rate" onchange="updateDeliveryPreview(this.form)"><option value="3000">3,000 د.ع (شفت واحد)</option><option value="5000" ${o.rate===5000?'selected':''}>5,000 د.ع (شفتين)</option>${o.rate===6000?'<option value="6000" selected>6,000 د.ع (التسعيرة السابقة)</option>':''}</select>`}`:''}${type==='safri'?`<label>اسم الوجبة / الأكل *</label><input name="meal" required maxlength="120" value="${esc(o.meal||'')}" placeholder="مثلاً: وجبة غداء">${safriReceiptFields(o)}`:''}<label>${type==='orders'||type==='deliveryFee'?'الإجمالي بالدينار':type==='paid'?'المبلغ المصروف':type==='absence'?'قيمة خصم الغياب بالدينار':'المبلغ بالدينار *'}</label><input id="amount" name="amount" type="number" min="0" required ${type==='orders'||type==='deliveryFee'?'readonly':''} value="${o.amount??(type==='absence'?Math.round(auto):type==='paid'?Math.max(0,calc(w).remaining):'')}"><label>الملاحظات / السبب</label><textarea name="note">${esc(o.note||'')}</textarea>${type==='paid'?`<p class="muted">المتبقي قبل الصرف: ${fmt(calc(w).remaining+(id?Number(o.amount):0))}. يمكن تسجيل صرف جزئي.</p>`:''}<p><button class="primary" type="submit">${type==='paid'?'تأكيد الصرف':'حفظ العملية'}</button></p></form>`);if(type==='safri')document.querySelector('#modalroot form').receiptImage=o.receipt||'';if(type==='orders')updateOrderTotals(document.querySelector('#modalroot form'));}function updateAbsencePreview(f){if(!f||!f.elements.days)return;let y=+f.elements.year.value,m=+f.elements.month.value,days=new Date(y,m,0).getDate(),count=+f.elements.days.value,w=db.workers.find(x=>x.id===selected);if(!w||!days||!Number.isFinite(count))return;let amount=Math.round(Number(w.salary)/30*count),hint=document.getElementById('absenceHint');if(hint)hint.textContent='أساس احتساب أجر اليوم: 30 يوم | الخصم التلقائي: '+fmt(amount);if(!f.querySelector('#manual')?.checked)f.elements.amount.value=amount}
 async function saveOp(e,type,id){e.preventDefault();let f=e.target,year=+f.year.value,month=+f.month.value,day=+f.day.value,date=`${year}-${String(month).padStart(2,'0')}-${String(day).padStart(2,'0')}`;if(new Date(date+'T12:00:00').getDate()!==day||new Date(date+'T12:00:00').getMonth()+1!==month){alert('التاريخ غير صحيح');return}let amount=+f.amount.value;
