@@ -222,6 +222,7 @@ async function startPayroll(){
     await loadPayroll();
     await ensureEmployeeNumbers();
     await applyNasserFixedSalary();
+    await closeRequestedDeliveryEntries();
     render();
     status.remove();
   }catch(error){
@@ -244,7 +245,7 @@ function calc(w, monthly=false){
    Number(operation.amount)===Math.round(calculatePayroll(w,ops.slice(cycleStart,index)).remaining);
   if(operation.deliverySettlement===true||coversLegacyBalance)cycleStart=index+1;
  });
- return calculatePayroll(w,ops.slice(cycleStart));
+ return calculatePayroll(w,ops.slice(cycleStart).filter(operation=>!operation.closedWithoutPayment));
 }
 function calculatePayroll(w,ops){
  let sum=t=>ops.filter(o=>o.type===t).reduce((a,o)=>a+(Number(o.amount)||0),0),year=Number(period.slice(0,4)),month=Number(period.slice(5,7)),days=new Date(year,month,0).getDate(),base=Number(w.salary)||0,first=period+'-01',last=period+'-'+String(days).padStart(2,'0'),from=w.start&&w.start>first?w.start:first,to=w.endDate&&w.endDate<last?w.endDate:last,eligibleDays=from<=to?Math.max(0,(Date.UTC(+to.slice(0,4),+to.slice(5,7)-1,+to.slice(8,10))-Date.UTC(+from.slice(0,4),+from.slice(5,7)-1,+from.slice(8,10)))/86400000+1):0,earned=w.delivery?(fixedDeliverySalary(w)? (eligibleDays>0?base:0):sum('orders')):Math.round(base*eligibleDays/30),advance=sum('advance'),safri=sum('safri'),deductions=sum('deduct'),absenceDays=ops.filter(o=>o.type==='absence').reduce((a,o)=>a+(Number(o.days)||0),0),absence=ops.filter(o=>o.type==='absence').reduce((a,o)=>a+(o.manual?Number(o.amount)||0:base/30*(Number(o.days)||0)),0),deliveryFee=w.delivery?sum('deliveryFee'):0,orderCount=ops.filter(o=>o.type==='orders').reduce((total,o)=>total+(Number(o.days)||0),0),deduct=deductions+absence+deliveryFee,bonus=sum('bonus'),paid=sum('paid');return{earned,deliveryFee,orderCount,eligibleDays,monthDays:days,absenceDays,advance,safri,deduct,deductions,absence,bonus,paid,remaining:earned+bonus-advance-safri-deduct-paid,ops}}function card(label,value){return `<div class="metric"><small>${label}</small><strong>${fmt(value)}</strong></div>`}function payrollSummary(){
@@ -414,6 +415,25 @@ async function applyNasserFixedSalary(){
  const worker=matches[0];
  const data={...db,workers:db.workers.map(w=>w===worker?{...w,salary:750000,salaryMode:'fixed'}:w),config:{...db.config,appliedUpdates:[...(db.config.appliedUpdates||[]),key]}};
  if(!await commitPayrollChange(data))throw Error('تعذّر حفظ راتب ناصر الثابت');
+}
+
+async function closeRequestedDeliveryEntries(){
+ const key='delivery-001-nov-2026-close-before-new-safri';
+ if(db.config.appliedUpdates?.includes(key))return;
+ const worker=db.workers.find(w=>deliveryByOrders(w)&&w.active!==false&&employeeNumber(w)==='001');
+ if(!worker)return;
+ const expected=[
+  ['2026-11-10','advance',50000],
+  ['2026-11-14','advance',75000],
+  ['2026-11-14','deliveryFee',54000],
+  ['2026-11-14','orders',373000]
+ ];
+ const matches=expected.map(([date,type,amount])=>db.ops.filter(o=>
+  o.worker===worker.id&&o.date===date&&o.type===type&&Number(o.amount)===amount));
+ if(matches.some(entries=>entries.length!==1))return;
+ const ids=new Set(matches.map(([operation])=>operation.id));
+ const ops=db.ops.map(o=>o.worker===worker.id&&ids.has(o.id)?{...o,closedWithoutPayment:true}:o);
+ await commitPayrollChange({...db,ops,config:{...db.config,appliedUpdates:[...(db.config.appliedUpdates||[]),key]}});
 }
 
 function todayISO(){const d=new Date();return [d.getFullYear(),d.getMonth()+1,d.getDate()].map(n=>String(n).padStart(2,'0')).join('-')}
